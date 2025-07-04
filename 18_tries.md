@@ -636,7 +636,7 @@ Where `n = s.length`
 
 ---
 
-## 🔎 **Space Complexity**
+### 🔎 **Space Complexity**
 
 You are given a **single string `s` of length `n`**, and you want to **store all distinct substrings** of `s`.
 
@@ -695,5 +695,292 @@ Each node has: character + pointer map (constant)
 ```
 
 > 📌 **Trie space = O(n²)**
+
+---
+
+## ⚡ **5. Maximum XOR With an Element From an Array (Using Trie)**
+
+### 📘 **Problem Statement**
+
+You are given:
+
+- An array of positive integers `arr`
+- A number `num`
+
+Your task is to return the **maximum value of `num ^ arr[i]`** for any element `arr[i]` in the array.
+
+---
+
+### 🧪 **Test Cases**
+
+**Test Case 1:**
+
+```javascript
+Input: arr = [3, 10, 5, 25, 2, 8], num = 5
+Output: 28
+Explanation: 5 ^ 25 = 28 is the maximum.
+```
+
+**Test Case 2:**
+
+```javascript
+Input: arr = [0, 1, 2, 3, 4], num = 1
+Output: 5
+Explanation: 1 ^ 4 = 5
+```
+
+**Test Case 3:**
+
+```javascript
+Input: arr = [7, 8, 2, 5], num = 6
+Output: 15
+Explanation: 6 ^ 9 = 15 (after padding to 32-bit and maximizing bit by bit)
+```
+
+---
+
+### 💡 **Intuition**
+
+To get the **maximum XOR**, we want to **maximize the difference in bits**:
+
+- At each bit (starting from MSB), we prefer choosing the **opposite bit** of the current bit in `num`.
+
+A **Trie (Prefix Tree)** is built using the **binary representation** of each number in the array (usually padded to 32 bits).
+
+While querying, we traverse the Trie to choose the **complement bit if available**, maximizing the XOR.
+
+---
+
+### ✅ **JavaScript Implementation**
+
+```javascript
+class TrieNode {
+  constructor() {
+    this.links = {}; // {0: TrieNode, 1: TrieNode}
+  }
+
+  has(bit) {
+    return bit in this.links;
+  }
+
+  get(bit) {
+    return this.links[bit];
+  }
+
+  put(bit, node) {
+    this.links[bit] = node;
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  insert(num) {
+    let node = this.root;
+    for (let i = 31; i >= 0; i--) {
+      let bit = (num >> i) & 1;
+      if (!node.has(bit)) {
+        node.put(bit, new TrieNode());
+      }
+      node = node.get(bit);
+    }
+  }
+
+  maxXor(num) {
+    let node = this.root;
+    let maxNum = 0;
+
+    for (let i = 31; i >= 0; i--) {
+      let bit = (num >> i) & 1;
+      let opp = 1 - bit; // complement
+
+      if (node.has(opp)) {
+        maxNum |= 1 << i; // set bit i to 1
+        node = node.get(opp);
+      } else {
+        node = node.get(bit);
+      }
+    }
+
+    return maxNum;
+  }
+}
+
+function findMaximumXOR(arr, num) {
+  const trie = new Trie();
+  for (let val of arr) {
+    trie.insert(val);
+  }
+
+  return trie.maxXor(num);
+}
+```
+
+---
+
+### 🔍 Example Dry Run
+
+Input: `arr = [3, 10, 5, 25, 2, 8], num = 5`
+
+- Binary of 5: `00000000000000000000000000000101`
+- Insert all `arr[i]` in Trie
+- Traverse Trie to pick opposite bits:
+
+  - `5 ^ 25 = 28` → highest possible
+
+---
+
+### ⏱ **Time and Space Complexity**
+
+| Measure | Complexity |
+| ------- | ---------- |
+| Insert  | O(32 × n)  |
+| Query   | O(32)      |
+| Space   | O(32 × n)  |
+
+Since we're dealing with 32-bit integers, operations are constant per bit (32 bits max).
+
+---
+
+### 📌 **Summary Table**
+
+| Step              | Description                               |
+| ----------------- | ----------------------------------------- |
+| Insert Numbers    | Add binary of each array number into Trie |
+| XOR Query         | For each bit, pick opposite if possible   |
+| Use 32-bit Format | Ensures uniform traversal depth in Trie   |
+
+---
+
+## ⚡ **6. Maximum XOR of Two Numbers in an Array (Trie Approach)**
+
+### 📘 **Problem Statement**
+
+Given an array of integers `nums`, return the **maximum XOR value** of any two elements:
+
+```text
+Return max(nums[i] ^ nums[j]) for all 0 ≤ i < j < n
+```
+
+---
+
+### 🧪 **Test Cases**
+
+**Test Case 1:**
+
+```javascript
+Input: nums = [3,10,5,25,2,8]
+Output: 28
+Explanation: 5 ^ 25 = 28
+```
+
+**Test Case 2:**
+
+```javascript
+Input: nums = [14, 70, 53, 83, 49, 91, 36, 80, 92, 51, 66, 70];
+Output: 127;
+```
+
+---
+
+### 💡 **Intuition**
+
+To find the **maximum XOR**, we want to maximize differing bits in higher positions.
+
+We:
+
+1. **Insert numbers into a Trie**, where each path from root to leaf represents the **32-bit binary** of a number.
+2. For each number:
+
+   - Traverse the Trie to find the **best complementary number** (greedy match with opposite bits) to maximize XOR.
+
+---
+
+### ✅ **JavaScript Implementation (Trie Based)**
+
+```javascript
+class TrieNode {
+  constructor() {
+    this.children = {};
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  insert(num) {
+    let node = this.root;
+    for (let i = 31; i >= 0; i--) {
+      let bit = (num >> i) & 1;
+      if (!node.children[bit]) {
+        node.children[bit] = new TrieNode();
+      }
+      node = node.children[bit];
+    }
+  }
+
+  getMaxXor(num) {
+    let node = this.root;
+    let maxXor = 0;
+
+    for (let i = 31; i >= 0; i--) {
+      let bit = (num >> i) & 1;
+      let toggled = 1 - bit;
+      if (node.children[toggled]) {
+        maxXor |= 1 << i;
+        node = node.children[toggled];
+      } else {
+        node = node.children[bit];
+      }
+    }
+
+    return maxXor;
+  }
+}
+
+function findMaximumXOR(nums) {
+  const trie = new Trie();
+  let maxXor = 0;
+
+  // Insert first number
+  trie.insert(nums[0]);
+
+  for (let i = 1; i < nums.length; i++) {
+    // Get max XOR for nums[i] with any number already in Trie
+    maxXor = Math.max(maxXor, trie.getMaxXor(nums[i]));
+
+    // Insert current number into Trie
+    trie.insert(nums[i]);
+  }
+
+  return maxXor;
+}
+```
+
+---
+
+### ⏱ **Time and Space Complexity**
+
+| Measure | Complexity       |
+| ------- | ---------------- |
+| Time    | O(n × 32) = O(n) |
+| Space   | O(n × 32) = O(n) |
+
+- `n` is number of elements in `nums`
+- 32 = fixed number of bits for 32-bit integers
+
+---
+
+### 📌 **Summary Table**
+
+| Step           | Explanation                                |
+| -------------- | ------------------------------------------ |
+| Insert in Trie | Store each number's binary in a Trie       |
+| XOR Query      | Traverse Trie greedily using opposite bits |
+| Max XOR        | Track highest XOR seen while processing    |
 
 ---
