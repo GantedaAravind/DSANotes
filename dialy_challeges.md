@@ -147,7 +147,7 @@ No string building, just bit manipulation!
 
 ---
 
-## 🧮 **5. K-th Character After Sequence of Copy and Transform Operations**
+## 🧮 ** K-th Character After Sequence of Copy and Transform Operations**
 
 ### 📘 **Problem Statement**
 
