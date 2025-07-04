@@ -984,3 +984,179 @@ function findMaximumXOR(nums) {
 | Max XOR        | Track highest XOR seen while processing    |
 
 ---
+
+## ⚡ **7. Maximum XOR With Element Not Greater Than mi (Using Trie)**
+
+### 📘 **Problem Statement**
+
+You are given:
+
+- An array `nums` of non-negative integers.
+- An array `queries`, where each query is `[xi, mi]`.
+
+For each query, return:
+
+```text
+max(nums[j] XOR xi) where nums[j] ≤ mi
+```
+
+If no such `nums[j]` exists, return `-1`.
+
+---
+
+### 🧪 **Test Cases**
+
+**Test Case 1:**
+
+```javascript
+Input: (nums = [0, 1, 2, 3, 4]),
+  (queries = [
+    [3, 1],
+    [1, 3],
+    [5, 6],
+  ]);
+Output: [3, 3, 7];
+```
+
+**Test Case 2:**
+
+```javascript
+Input: (nums = [5, 2, 4, 6, 6, 3]),
+  (queries = [
+    [12, 4],
+    [8, 1],
+    [6, 3],
+  ]);
+Output: [15, -1, 5];
+```
+
+---
+
+### 💡 **Intuition**
+
+To maximize XOR under constraint `nums[j] ≤ mi`, we:
+
+1. Sort both `nums` and `queries` by `mi`.
+2. Use a **Trie** to insert only those elements of `nums` that are `≤ mi` for the current query.
+3. For each query:
+
+   - Insert all relevant `nums[j]` into the Trie.
+   - Query the Trie to find `max(xi ^ nums[j])`.
+
+> ✅ Efficient because each number is inserted **once** and reused for multiple queries.
+
+---
+
+### 🌲 **Trie Design**
+
+Each number is inserted bit by bit (from MSB to LSB, 31 → 0) into the Trie.
+
+### TrieNode:
+
+```javascript
+function TrieNode() {
+  this.links = [null, null]; // index 0 or 1 for bits
+}
+```
+
+### Trie Methods:
+
+```javascript
+function Trie() {
+  this.root = new TrieNode();
+}
+
+Trie.prototype.insert = function (num) {
+  let node = this.root;
+  for (let i = 31; i >= 0; i--) {
+    const bit = (num >> i) & 1;
+    if (!node.links[bit]) {
+      node.links[bit] = new TrieNode();
+    }
+    node = node.links[bit];
+  }
+};
+
+Trie.prototype.maxXor = function (num) {
+  let node = this.root,
+    xor = 0;
+  for (let i = 31; i >= 0; i--) {
+    const bit = (num >> i) & 1;
+    const toggled = 1 - bit;
+    xor <<= 1;
+    if (node.links[toggled]) {
+      xor |= 1;
+      node = node.links[toggled];
+    } else {
+      node = node.links[bit];
+    }
+  }
+  return xor;
+};
+```
+
+---
+
+### ✅ **Final Algorithm**
+
+```javascript
+var maximizeXor = function (nums, queries) {
+  nums.sort((a, b) => a - b); // Sort nums for efficient insertion
+
+  // Append original index to each query for result reordering
+  queries.forEach((query, i) => query.push(i));
+  queries.sort((a, b) => a[1] - b[1]); // Sort queries by mi
+
+  let trie = new Trie();
+  let result = new Array(queries.length);
+  let j = 0; // Pointer for nums
+
+  for (let [xi, mi, idx] of queries) {
+    // Insert all nums[j] <= mi into Trie
+    while (j < nums.length && nums[j] <= mi) {
+      trie.insert(nums[j]);
+      j++;
+    }
+
+    // If at least one number has been inserted
+    if (j > 0) {
+      result[idx] = trie.maxXor(xi);
+    } else {
+      result[idx] = -1;
+    }
+  }
+
+  return result;
+};
+```
+
+---
+
+### ⏱ **Time and Space Complexity**
+
+| Operation | Complexity           |
+| --------- | -------------------- |
+| Sorting   | O(n log n + q log q) |
+| Insertion | O(32 \* n)           |
+| Query     | O(32 \* q)           |
+| Space     | O(32 \* n)           |
+
+Where:
+
+- `n` = length of `nums`
+- `q` = number of queries
+
+> Handles constraints `1 ≤ nums.length, queries.length ≤ 1e5` efficiently.
+
+---
+
+### 📌 **Summary Table**
+
+| Step                | Purpose                                   |
+| ------------------- | ----------------------------------------- |
+| Sort nums & queries | Efficient insert + query management       |
+| Trie insert         | Only nums\[j] ≤ mi are inserted per query |
+| Query with XOR      | Traverse greedily to maximize XOR         |
+| Reordering result   | Track original indices in query           |
+
+---
