@@ -1,4 +1,4 @@
-# 🧠 **Dynamic Programming (DP) **
+# 🧠 **Dynamic Programming (DP)**
 
 ## 📌 **What is Dynamic Programming?**
 
@@ -58,7 +58,7 @@ function fib(n) {
 
 ---
 
-## 🔢 ** Fibonacci Number **
+## 🔢 **Fibonacci Number**
 
 ### 📘 Problem Statement
 

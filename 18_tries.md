@@ -635,3 +635,65 @@ Where `n = s.length`
 | Add empty string    | Count + 1 to include `""`            |
 
 ---
+
+## 🔎 **Space Complexity**
+
+You are given a **single string `s` of length `n`**, and you want to **store all distinct substrings** of `s`.
+
+---
+
+### 1️⃣ **Using HashSet**
+
+#### 🎯 Strategy:
+
+- Generate **all substrings** and insert each into a **HashSet** to avoid duplicates.
+
+#### 🔢 Number of substrings:
+
+There are approximately `O(n²)` substrings:
+
+- Each substring `s[i..j]` where `0 ≤ i ≤ j < n`
+- Total = `n(n + 1)/2`
+
+#### 🧠 Space Complexity:
+
+Each substring is stored **as a separate string** of up to `O(n)` length (on average ≈ `n/2`)
+
+So total space:
+
+```
+O(n²) substrings × O(n) space each (in worst case) = O(n³)
+```
+
+> 📌 **HashSet worst-case space = O(n³)**
+> (if strings are stored as separate copies and no prefix reuse)
+
+---
+
+### 2️⃣ **Using Trie**
+
+#### 🎯 Strategy:
+
+- Insert every suffix of the string into the Trie.
+- Each path in the Trie implicitly encodes all substrings that start at that suffix.
+
+#### 🔢 Number of nodes:
+
+- Total characters inserted = all suffix substrings:
+
+  - `"abc"` → insert `"abc"`, `"bc"`, `"c"` = `n + (n - 1) + ... + 1 = O(n²)`
+
+- But **shared prefixes** are reused — so total number of Trie nodes ≤ `n(n + 1)/2`
+
+#### 🧠 Space Complexity:
+
+Each **unique character in each unique path** is stored as a node (shared where possible), so:
+
+```
+Worst-case = O(n²) nodes (1 per unique substring char)
+Each node has: character + pointer map (constant)
+```
+
+> 📌 **Trie space = O(n²)**
+
+---
