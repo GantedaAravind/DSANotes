@@ -65,93 +65,6 @@ Array: [50, 30, 40, 10, 20]
 
 ---
 
-## ✅ **Why and When We Use Heap Instead of Sorting**
-
-### 🧠 **The Core Idea**
-
-When you **don’t need the full sorted array**, and you’re only interested in the **top or bottom `k` elements**, **sorting** is **wasteful**.
-
-Instead of sorting the whole array (`O(n log n)`), we can use a **Heap** and reduce the time to `O(n log k)`.
-
----
-
-### 🔄 **Sorting vs Heap Comparison**
-
-| Method        | Use Case                   | Time Complexity |
-| ------------- | -------------------------- | --------------- |
-| Sorting       | Full sorted order          | `O(n log n)`    |
-| Heap (size k) | Top/Bottom k elements only | `O(n log k)` ✅ |
-
-If `k` is small and `n` is large, **heaps save a LOT of time**.
-
----
-
-## 📦 Example Problem: "Find the K Largest Elements"
-
-**Problem:**
-You are given an array of `n` elements. Find the **k largest** elements in the array.
-
----
-
-### ❌ Brute Force (Using Sort)
-
-1. Sort the array → `O(n log n)`
-2. Take the last `k` elements → `O(k)`
-
-#### Total Time: `O(n log n)`
-
-### ✅ Optimal Method (Using Min-Heap of size k)
-
-#### 💡 Why Min-Heap?
-
-- We maintain the **k largest** elements seen so far.
-- The **smallest among those k** will be at the **top of the min-heap**.
-- if size of Heap becomes the more than `k` remove the top element.
-
-#### ⏱ Time Complexity:
-
-- Insertion in heap: `O(log k)`
-- For `n` elements: `O(n log k)`
-
-✅ **Much faster than sorting when `k << n`**
-
----
-
-## ✅ Choosing Between **Min-Heap** and **Max-Heap** for Top-K Problems
-
-| Problem Type            | Heap Type Used | Why?                                                                                       |
-| ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| **K Smallest Elements** | **Max-Heap**   | So the **largest among the smallest k** is on top. If a new number is smaller, replace it. |
-| **K Largest Elements**  | **Min-Heap**   | So the **smallest among the largest k** is on top. If a new number is larger, replace it.  |
-
----
-
-> **Insert every candidate**, then:
->
-> - If **heap size exceeds `k`**, we **remove the root (top)**.
-
-## 📦 Example 1: **K Largest Elements → Min-Heap of Size k**
-
-We want top `k` largest numbers, so we:
-
-- Maintain the **smallest among the top k** at the root.
-- Replace root if a **new number is larger**.
-
-✅ Use **Min-Heap**
-
----
-
-## 📦 Example 2: **K Smallest Elements → Max-Heap of Size k**
-
-We want top `k` smallest numbers, so we:
-
-- Maintain the **largest among the top k** at the root.
-- Replace root if a **new number is smaller**.
-
-✅ Use **Max-Heap**
-
----
-
 ## ✅ `MinHeap` Class
 
 ```javascript
@@ -263,5 +176,206 @@ console.log(minHeap.toArray()); // [5, 10, 15]
 | `insert()`     | O(log n) |
 | `extractMin()` | O(log n) |
 | `peek()`       | O(1)     |
+
+---
+
+## ✅ `MaxHeap` Class
+
+```javascript
+class MaxHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  // 🔼 Insert a new value into the heap
+  insert(value) {
+    this.heap.push(value); // Step 1: Add at the end
+    this._heapifyUp(this.heap.length - 1); // Step 2: Heapify up from the last index
+  }
+
+  // 🧹 Remove and return the maximum element (root)
+  extractMax() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const max = this.heap[0];
+    this.heap[0] = this.heap.pop(); // Move last to root
+    this._heapifyDown(0); // Restore heap property
+
+    return max;
+  }
+
+  // 👀 View the maximum element without removing
+  peek() {
+    return this.heap.length > 0 ? this.heap[0] : null;
+  }
+
+  // 🔄 Heapify up from a given index
+  _heapifyUp(index) {
+    while (index > 0) {
+      const parentIndex = Math.floor((index - 1) / 2);
+
+      if (this.heap[parentIndex] >= this.heap[index]) break;
+
+      this._swap(index, parentIndex);
+      index = parentIndex;
+    }
+  }
+
+  // 🔄 Heapify down from a given index
+  _heapifyDown(index) {
+    const length = this.heap.length;
+
+    while (true) {
+      const left = 2 * index + 1;
+      const right = 2 * index + 2;
+      let largest = index;
+
+      if (left < length && this.heap[left] > this.heap[largest]) {
+        largest = left;
+      }
+
+      if (right < length && this.heap[right] > this.heap[largest]) {
+        largest = right;
+      }
+
+      if (largest === index) break;
+
+      this._swap(index, largest);
+      index = largest;
+    }
+  }
+
+  // 🔁 Swap helper function
+  _swap(i, j) {
+    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+  }
+
+  // 📏 Return heap size
+  size() {
+    return this.heap.length;
+  }
+
+  // 📦 Return heap as array
+  toArray() {
+    return [...this.heap];
+  }
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```javascript
+const maxHeap = new MaxHeap();
+
+maxHeap.insert(10);
+maxHeap.insert(5);
+maxHeap.insert(15);
+maxHeap.insert(20);
+
+console.log(maxHeap.toArray()); // [20, 15, 10, 5]
+console.log(maxHeap.peek()); // 20
+console.log(maxHeap.extractMax()); // 20
+console.log(maxHeap.toArray()); // [15, 5, 10]
+```
+
+---
+
+### ✅ Time Complexity
+
+| Operation      | Time     |
+| -------------- | -------- |
+| `insert()`     | O(log n) |
+| `extractMax()` | O(log n) |
+| `peek()`       | O(1)     |
+
+---
+
+## ✅ **Why and When We Use Heap Instead of Sorting**
+
+### 🧠 **The Core Idea**
+
+When you **don’t need the full sorted array**, and you’re only interested in the **top or bottom `k` elements**, **sorting** is **wasteful**.
+
+Instead of sorting the whole array (`O(n log n)`), we can use a **Heap** and reduce the time to `O(n log k)`.
+
+---
+
+### 🔄 **Sorting vs Heap Comparison**
+
+| Method        | Use Case                   | Time Complexity |
+| ------------- | -------------------------- | --------------- |
+| Sorting       | Full sorted order          | `O(n log n)`    |
+| Heap (size k) | Top/Bottom k elements only | `O(n log k)` ✅ |
+
+If `k` is small and `n` is large, **heaps save a LOT of time**.
+
+---
+
+## 📦 Example Problem: "Find the K Largest Elements"
+
+**Problem:**
+You are given an array of `n` elements. Find the **k largest** elements in the array.
+
+---
+
+### ❌ Brute Force (Using Sort)
+
+1. Sort the array → `O(n log n)`
+2. Take the last `k` elements → `O(k)`
+
+#### Total Time: `O(n log n)`
+
+### ✅ Optimal Method (Using Min-Heap of size k)
+
+#### 💡 Why Min-Heap?
+
+- We maintain the **k largest** elements seen so far.
+- The **smallest among those k** will be at the **top of the min-heap**.
+- if size of Heap becomes the more than `k` remove the top element.
+
+#### ⏱ Time Complexity:
+
+- Insertion in heap: `O(log k)`
+- For `n` elements: `O(n log k)`
+
+✅ **Much faster than sorting when `k << n`**
+
+---
+
+## ✅ Choosing Between **Min-Heap** and **Max-Heap** for Top-K Problems
+
+| Problem Type            | Heap Type Used | Why?                                                                                       |
+| ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| **K Smallest Elements** | **Max-Heap**   | So the **largest among the smallest k** is on top. If a new number is smaller, replace it. |
+| **K Largest Elements**  | **Min-Heap**   | So the **smallest among the largest k** is on top. If a new number is larger, replace it.  |
+
+---
+
+> **Insert every candidate**, then:
+>
+> - If **heap size exceeds `k`**, we **remove the root (top)**.
+
+## 📦 Example 1: **K Largest Elements → Min-Heap of Size k**
+
+We want top `k` largest numbers, so we:
+
+- Maintain the **smallest among the top k** at the root.
+- Replace root if a **new number is larger**.
+
+✅ Use **Min-Heap**
+
+---
+
+## 📦 Example 2: **K Smallest Elements → Max-Heap of Size k**
+
+We want top `k` smallest numbers, so we:
+
+- Maintain the **largest among the top k** at the root.
+- Replace root if a **new number is smaller**.
+
+✅ Use **Max-Heap**
 
 ---
