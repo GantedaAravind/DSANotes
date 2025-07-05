@@ -7,9 +7,11 @@
 
 ---
 
-### ✅ **Searching Algorithms**
+### ✅ **Sorted Arrays**
 
 - **Binary Search**: Use on sorted arrays to reduce time to `O(log n)`.
+
+- When to Use Binary Search on Answers find the **optimal answer (min/max)** when the **search space is numeric and monotonic** (either increasing or decreasing behavior).
 
 ---
 
