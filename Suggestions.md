@@ -1,103 +1,119 @@
-- sum - prefix sum
-- always you dooing the array O(n2) can done with hash map by o(n)
-- when searching two elements you use one for hashmap and other at that index and iterate find the pair
+### ✅ **Sorting Algorithms**
 
-- sorted - binary Search
-
-- answer in the range `Binary Search on answers`
-- min max / max min `binary search on answers`
--
-
-## ✅ When to Use `mod` (Modulo)
-
-You typically apply the **modulo**:
-
-1. **After every multiplication**
-2. **After every addition**
-3. **After subtraction (with adjustment)**
-4. **Never inside exponentiation unless carefully handled (usually at base)**
+- **Merge Sort**: Use when stable sort is needed; works well on linked lists or large datasets.
+- **Quick Sort**: Fast average case; good for in-memory arrays, avoid for worst-case unless randomized.
+- **Heap Sort**: Use when constant space is needed and stability is not important.
+- **Counting/Radix Sort**: Use for integers with limited range.
 
 ---
 
-### 🔢 Rules of Modulo Arithmetic
+### ✅ **Searching Algorithms**
 
-Let `mod = 10⁹ + 7`, a large prime.
-Suppose `a` and `b` are integers:
-
-#### Addition
-
-```
-(a + b) % mod = ((a % mod) + (b % mod)) % mod
-```
-
-#### Subtraction
-
-```
-(a - b + mod) % mod = ensures non-negative result
-```
-
-#### Multiplication
-
-```
-(a * b) % mod = ((a % mod) * (b % mod)) % mod
-```
-
-#### Exponentiation
-
-Use **modular exponentiation**: `(a^b) % mod`
-This must be done carefully using a loop or recursion:
-
-```js
-function modPow(a, b, mod) {
-  let result = 1;
-  a = a % mod;
-
-  while (b > 0) {
-    if (b % 2 === 1) {
-      result = (result * a) % mod;
-    }
-    a = (a * a) % mod;
-    b = Math.floor(b / 2);
-  }
-
-  return result;
-}
-```
+- **Binary Search**: Use on sorted arrays to reduce time to `O(log n)`.
 
 ---
 
-### 🔍 Example
+### ✅ **Prefix Sum**
 
-**Avoid doing this:**
-
-```js
-let result = (Math.pow(5, 1e15) * Math.pow(4, 1e15)) % MOD; // ❌ Overflow
-```
-
-**Do this instead:**
-
-```js
-let res = (modPow(5, evenCount, MOD) * modPow(4, oddCount, MOD)) % MOD; // ✅
-```
+- Use Prefix Sum when you need to quickly calculate the sum of elements in a subarray multiple times.
 
 ---
 
-### 🧠 Best Practices
+### ✅ **Hashing (HashMap / HashSet)**
 
-- Use `% mod` **after every step of computation** involving big numbers.
-- When combining multiple operations, **mod after each multiplication or addition**.
-- For large powers, **use modular exponentiation** (not built-in `Math.pow`).
-- Use a **prime modulus (like 10⁹+7)** for well-behaved inverse properties if needed.
+- Use when fast insert, delete, and search (`O(1)` avg) is needed.
+- Best for frequency maps, lookups, avoiding duplicates.
 
 ---
 
-### 💡 In Summary
+### ✅ **Heap (Priority Queue)**
 
-| Operation | Apply `mod` After                     |
-| --------- | ------------------------------------- |
-| `a + b`   | `((a % mod) + (b % mod)) % mod`       |
-| `a - b`   | `((a % mod) - (b % mod) + mod) % mod` |
-| `a * b`   | `((a % mod) * (b % mod)) % mod`       |
-| `a^b`     | Use modular exponentiation            |
+- Use for top `k` problems (`n log k` instead of `n log n`).
+- **Min-Heap**: For **k largest** elements.
+- **Max-Heap**: For **k smallest** elements.
+- Use in Dijkstra’s, Huffman coding, or scheduling tasks.
+
+---
+
+### ✅ **Two Pointers / Sliding Window**
+
+- Use for subarray/substring problems (e.g., max sum, longest window).
+- Efficient in reducing nested loops to `O(n)`.
+
+---
+
+### ✅ **Greedy**
+
+- Use when local optimal choices lead to global optimal (e.g., activity selection, Huffman coding).
+- Usually simpler and faster if applicable.
+
+---
+
+### ✅ **Recursion & Backtracking**
+
+- Use for exhaustive search in combinations, permutations, N-Queens, Sudoku.
+- Backtracking = recursion with pruning.
+
+---
+
+### ✅ **Divide and Conquer**
+
+- Use to break problem into subproblems: merge sort, quick sort, binary search.
+- Efficient for large input sizes.
+
+---
+
+### ✅ **Dynamic Programming (DP)**
+
+- Use when problem has **overlapping subproblems + optimal substructure**.
+- Good for: Knapsack, DP on strings, LIS, LCS, etc.
+- Use memoization (`top-down`) or tabulation (`bottom-up`).
+
+---
+
+### ✅ **Graphs**
+
+- **DFS/BFS**: Traversal, connected components, shortest paths (unweighted).
+- **Dijkstra’s**: Shortest path in weighted graphs with non-negative weights.
+- **Bellman-Ford**: Shortest path with negative weights.
+- **Floyd-Warshall**: All-pairs shortest paths.
+- **Union-Find (DSU)**: Cycle detection, Kruskal’s MST, disjoint sets.
+
+---
+
+### ✅ **Trie**
+
+- Use for prefix-based searching: dictionary, autocomplete, bitwise problems (XOR).
+- Efficient for string sets or IP routing.
+
+---
+
+### ✅ **Segment Tree / Binary Indexed Tree (Fenwick Tree)**
+
+- Use for **range queries** and **updates** (sum, min, max) in `O(log n)` time.
+- Segment Tree: More flexible, supports complex operations.
+- Fenwick Tree: More space-efficient for cumulative frequency.
+
+---
+
+### ✅ **Linked List**
+
+- Use when frequent insert/delete from middle or ends are needed.
+- Doubly linked list for LRU Cache.
+- Use for dynamic memory when size is not known in advance.
+
+---
+
+### ✅ **Stack**
+
+- Use for expression evaluation, backtracking, or tracking state (e.g., parentheses validation, histogram).
+- Supports LIFO operations.
+
+---
+
+### ✅ **Queue / Deque**
+
+- Queue: BFS, task scheduling (FIFO).
+- Deque: Sliding window max/min, LRU cache.
 
 ---
