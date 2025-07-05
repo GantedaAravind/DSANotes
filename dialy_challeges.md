@@ -1,4 +1,4 @@
-## 🔁 ** Kth Character After Infinite Operations**
+## 🔁 **Kth Character After Infinite Operations**
 
 ### 📘 **Problem Statement**
 
@@ -147,7 +147,7 @@ No string building, just bit manipulation!
 
 ---
 
-## 🧮 ** K-th Character After Sequence of Copy and Transform Operations**
+## 🧮 **K-th Character After Sequence of Copy and Transform Operations**
 
 ### 📘 **Problem Statement**
 
