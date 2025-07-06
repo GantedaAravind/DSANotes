@@ -313,6 +313,193 @@ Answer is `5`
 
 ---
 
+Sure! Here's a complete **note-style explanation** on the **time complexity of the recursive Fibonacci algorithm using recursion tree analysis**:
+
+---
+
+## 📘 Fibonacci Recursive Time Complexity — Notes
+
+## ✅ 1. Problem Definition
+
+The classic recursive Fibonacci function:
+
+```js
+function fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+```
+
+---
+
+## 🔁 2. Recursive Formula
+
+```
+fib(n) = fib(n - 1) + fib(n - 2)
+Base cases: fib(0) = 0, fib(1) = 1
+```
+
+---
+
+## 🌳 3. Recursion Tree Structure
+
+Each `fib(n)` calls:
+
+- `fib(n - 1)`
+- `fib(n - 2)`
+
+Each of these again makes **2 recursive calls**, and so on.
+
+So, the recursive calls form a **binary tree** structure:
+
+- Every non-base node has **2 children**
+- The tree grows until `n = 0` or `n = 1`
+
+Example for `fib(4)`:
+
+```
+              fib(4)
+             /     \
+        fib(3)     fib(2)
+       /     \     /     \
+   fib(2)  fib(1) fib(1) fib(0)
+   /    \
+fib(1) fib(0)
+```
+
+Total function calls = **number of nodes = 9**
+
+---
+
+## ⏱️ 4. Why Time Complexity = Number of Nodes?
+
+- Each recursive call (node) does **constant work** (base check + add).
+- So **total time** is proportional to the **number of calls**.
+- ➤ **Each call = one node in recursion tree**
+- ➤ **Total time = O(number of nodes)**
+
+---
+
+## 📈 5. Total Nodes in Tree ≈ O(2ⁿ)
+
+- Recursion tree is approximately a **full binary tree** of height `n`
+- A full binary tree with height `n` has ≈ `2ⁿ` nodes
+- Therefore:
+
+```
+T(n) ≈ 2ⁿ  → Time complexity = O(2ⁿ)
+```
+
+---
+
+## 📦 6. Time & Space Complexity
+
+| Complexity Type  | Value | Reason                                |
+| ---------------- | ----- | ------------------------------------- |
+| Time Complexity  | O(2ⁿ) | Exponential number of recursive calls |
+| Space Complexity | O(n)  | Max depth of recursion stack          |
+
+---
+
+## 🧠 7. Why This Is Inefficient
+
+- Many **repeated subproblems** (e.g., `fib(2)`, `fib(1)` appear many times)
+- Wasted computation → makes recursion slow
+
+---
+
+## 🚀 8. Optimized Alternatives
+
+| Method                 | Time Complexity | Space Complexity |
+| ---------------------- | --------------- | ---------------- |
+| Memoization (Top-down) | O(n)            | O(n)             |
+| Tabulation (Bottom-up) | O(n)            | O(1)             |
+| Matrix Exponentiation  | O(log n)        | O(1)             |
+
+---
+
+## **Determine the time complexity of any recursion**
+
+### 🔁 1. **Write the Recurrence Relation**
+
+If a function calls itself recursively, figure out:
+
+- How many times it calls itself
+- How the input size reduces
+- Any additional work done outside the recursion
+
+👉 **Example:**
+
+```js
+function fact(n) {
+  if (n == 0) return 1;
+  return n * fact(n - 1);
+}
+```
+
+This does **one recursive call**, reducing `n` by 1 →
+**Recurrence:** T(n) = T(n - 1) + O(1)
+➡️ **Time Complexity:** O(n)
+
+---
+
+### 🔁 2. **Use Recursion Tree Method**
+
+Break down the recursive calls level by level like a tree, and sum all work.
+
+👉 **Example:**
+
+```js
+function fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+```
+
+Here, each call makes **2 calls**, so it's a binary tree of height `n`.
+
+➡️ Total nodes ≈ 2ⁿ
+➡️ **Time Complexity:** O(2ⁿ) (exponential)
+
+---
+
+### 🧮 3. **Master Theorem** (for Divide & Conquer)
+
+Use when recursion is of the form:
+**T(n) = aT(n/b) + O(n^d)**
+
+- `a` = number of recursive calls
+- `n/b` = size of each subproblem
+- `O(n^d)` = work done outside recursion
+
+👉 **Example (Merge Sort):**
+
+```js
+T(n) = 2T(n/2) + O(n)
+```
+
+➡️ `a = 2`, `b = 2`, `d = 1`
+➡️ **Time Complexity:** O(n log n)
+
+---
+
+### 📌 4. **Memoization/DP? Then it’s Subproblem Count × Work per Subproblem**
+
+👉 **Example:**
+
+```js
+function fib(n, dp) {
+  if (n <= 1) return n;
+  if (dp[n] != -1) return dp[n];
+  return (dp[n] = fib(n - 1, dp) + fib(n - 2, dp));
+}
+```
+
+There are **O(n)** subproblems and each solved in O(1) due to memoization
+➡️ **Time Complexity:** O(n)
+
+---
+
 # 1D Dp
 
 ## 🔢 **1. Climbing Stairs**
@@ -12163,7 +12350,6 @@ Input matrix:
 0 1 1 1
 1 1 1 1
 0 1 1 1
-
 DP matrix:
 0 1 1 1
 1 1 2 2
