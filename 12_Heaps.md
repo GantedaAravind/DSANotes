@@ -380,6 +380,137 @@ We want top `k` smallest numbers, so we:
 
 ---
 
+
+
+
+## ✅ Custom `MinHeap` with Comparator Function
+
+
+### 🧠 How it works under the hood:
+
+* JavaScript’s `.sort()` accepts a **comparator** function `compare(a, b)`:
+
+  * If it returns `< 0`, `a` comes before `b`
+  * If it returns `0`, they stay unchanged
+  * If it returns `> 0`, `b` comes before `a`
+
+---
+```javascript
+class MinHeap {
+  constructor(compareFn) {
+    this.data = [];
+    this.compare = compareFn || ((a, b) => a - b); // Default: min-heap for numbers
+  }
+
+  getParentIndex(i) { return Math.floor((i - 1) / 2); }
+  getLeftChildIndex(i) { return 2 * i + 1; }
+  getRightChildIndex(i) { return 2 * i + 2; }
+
+  swap(i, j) {
+    [this.data[i], this.data[j]] = [this.data[j], this.data[i]];
+  }
+
+  insert(val) {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  heapifyUp() {
+    let index = this.data.length - 1;
+    while (
+      index > 0 &&
+      this.compare(this.data[index], this.data[this.getParentIndex(index)]) < 0
+    ) {
+      this.swap(index, this.getParentIndex(index));
+      index = this.getParentIndex(index);
+    }
+  }
+
+  extractMin() {
+    if (this.data.length === 0) return null;
+    if (this.data.length === 1) return this.data.pop();
+
+    const min = this.data[0];
+    this.data[0] = this.data.pop();
+    this.heapifyDown();
+    return min;
+  }
+
+  heapifyDown() {
+    let index = 0;
+    const length = this.data.length;
+
+    while (this.getLeftChildIndex(index) < length) {
+      let smallerChildIndex = this.getLeftChildIndex(index);
+      const rightIndex = this.getRightChildIndex(index);
+
+      if (
+        rightIndex < length &&
+        this.compare(this.data[rightIndex], this.data[smallerChildIndex]) < 0
+      ) {
+        smallerChildIndex = rightIndex;
+      }
+
+      if (this.compare(this.data[index], this.data[smallerChildIndex]) <= 0) {
+        break;
+      }
+
+      this.swap(index, smallerChildIndex);
+      index = smallerChildIndex;
+    }
+  }
+
+  peek() {
+    return this.data.length > 0 ? this.data[0] : null;
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  isEmpty() {
+    return this.data.length === 0;
+  }
+}
+```
+
+---
+
+### ✅ Example 1: Min Heap for numbers
+
+```javascript
+const heap = new MinHeap((a, b) => a - b);
+heap.insert(5);
+heap.insert(2);
+heap.insert(8);
+heap.insert(1);
+
+while (!heap.isEmpty()) {
+  console.log(heap.extractMin()); // 1, 2, 5, 8
+}
+```
+
+---
+
+### ✅ Example 2: Min Heap for objects (e.g., sort by `age`)
+
+```javascript
+const heap = new MinHeap((a, b) => a.age - b.age);
+
+heap.insert({ name: "Alice", age: 30 });
+heap.insert({ name: "Bob", age: 25 });
+heap.insert({ name: "Charlie", age: 35 });
+
+while (!heap.isEmpty()) {
+  console.log(heap.extractMin());
+}
+// { name: "Bob", age: 25 }
+// { name: "Alice", age: 30 }
+// { name: "Charlie", age: 35 }
+```
+
+---
+
 # Learning
 
 ## ✅ **1. Check if an Array Represents a Min Heap**
@@ -2246,5 +2377,716 @@ events = [
 | Sorting Order        | Sort by time, dep before arr on tie |
 | Sweep Line           | Simulate platform usage dynamically |
 | Max Platforms Needed | Track max during the sweep          |
+
+---
+## ✅ **10. Frequency Sort Using Max Heap**
+
+### 📘 Problem Statement
+
+You're given an **array of elements** (can be numbers or characters). Your task is to return a list where elements are sorted by their **frequency in descending order**.
+
+If two elements have the same frequency, order doesn't matter (unless otherwise specified).
+
+---
+
+### 🧪 Example
+
+```js
+Input: [1, 1, 1, 2, 2, 3];
+Output: [1, 1, 1, 2, 2, 3];
+
+Input: ["a", "b", "a", "c", "b", "a"];
+Output: ["a", "a", "a", "b", "b", "c"];
+```
+
+---
+
+### 💡 Intuition
+
+1. First, count the frequency of each element using a **map**.
+2. Use a **Max Heap (priority queue)** where the element with **highest frequency** is on top.
+3. Extract elements from the heap and build the result by repeating each element its frequency number of times.
+
+---
+
+### ✅ Implementation
+
+```js
+class MaxHeap {
+  constructor(compareFn) {
+    this.data = [];
+    this.compare = compareFn;
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  isEmpty() {
+    return this.size() === 0;
+  }
+
+  insert(val) {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  extractMax() {
+    if (this.size() === 0) return null;
+    if (this.size() === 1) return this.data.pop();
+
+    const top = this.data[0];
+    this.data[0] = this.data.pop();
+    this.heapifyDown();
+    return top;
+  }
+
+  swap(i, j) {
+    [this.data[i], this.data[j]] = [this.data[j], this.data[i]];
+  }
+
+  heapifyUp() {
+    let index = this.size() - 1;
+    while (
+      index > 0 &&
+      this.compare(this.data[index], this.data[this.parent(index)]) > 0
+    ) {
+      this.swap(index, this.parent(index));
+      index = this.parent(index);
+    }
+  }
+
+  heapifyDown() {
+    let index = 0;
+    while (this.left(index) < this.size()) {
+      let largest = this.left(index);
+      if (
+        this.right(index) < this.size() &&
+        this.compare(this.data[this.right(index)], this.data[largest]) > 0
+      ) {
+        largest = this.right(index);
+      }
+      if (this.compare(this.data[index], this.data[largest]) >= 0) break;
+      this.swap(index, largest);
+      index = largest;
+    }
+  }
+
+  parent(i) {
+    return Math.floor((i - 1) / 2);
+  }
+
+  left(i) {
+    return 2 * i + 1;
+  }
+
+  right(i) {
+    return 2 * i + 2;
+  }
+}
+```
+
+---
+
+### 🧩 Frequency Sort Function
+
+```js
+function frequencySort(arr) {
+  const freqMap = new Map();
+
+  for (let num of arr) {
+    freqMap.set(num, (freqMap.get(num) || 0) + 1);
+  }
+
+  const heap = new MaxHeap((a, b) => a[1] - b[1]); // Compare by frequency
+
+  for (let [val, freq] of freqMap.entries()) {
+    heap.insert([val, freq]);
+  }
+
+  const result = [];
+
+  while (!heap.isEmpty()) {
+    const [val, freq] = heap.extractMax();
+    for (let i = 0; i < freq; i++) {
+      result.push(val);
+    }
+  }
+
+  return result;
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(frequencySort([1, 1, 1, 2, 2, 3])); 
+// Output: [1, 1, 1, 2, 2, 3]
+
+console.log(frequencySort(["a", "b", "a", "c", "b", "a"])); 
+// Output: ["a", "a", "a", "b", "b", "c"]
+```
+
+---
+
+### 🔄 Internal `freqMap` (for visualization)
+
+For input: `[1, 1, 1, 2, 2, 3]`
+
+```js
+freqMap = {
+  1: 3,
+  2: 2,
+  3: 1
+}
+```
+
+Heap contains entries: `[1, 3]`, `[2, 2]`, `[3, 1]`
+MaxHeap ensures highest frequency comes out first.
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step                 | Complexity   |
+| -------------------- | ------------ |
+| Frequency Counting   | `O(n)`       |
+| Heap Insertions      | `O(n log n)` |
+| Heap Extraction      | `O(n log n)` |
+| Result Construction  | `O(n)`       |
+| **Total Time**       | `O(n log n)` |
+| **Space Complexity** | `O(n)`       |
+
+---
+
+### 📌 Summary
+
+| Concept             | Explanation                          |
+| ------------------- | ------------------------------------ |
+| Frequency Map       | Track how often each element appears |
+| Max Heap            | Highest freq item is always on top   |
+| Comparator Function | Used to customize heap behavior      |
+| Result Construction | Rebuild array by frequency order     |
+
+---
+
+## ✅ **11. K Closest Points to Origin**
+
+### 📘 Problem Statement
+
+You're given an array of points in 2D space: `[[x1, y1], [x2, y2], ...]` and an integer `k`.
+Your task is to return the **`k` points closest to the origin (0, 0)\`**.
+
+---
+
+### 🧪 Example
+
+```js
+Input: points = [[1,3],[-2,2],[5,8],[0,1]], k = 2  
+Output: [[-2,2],[0,1]]
+```
+
+Explanation:
+
+* Distances: (1,3) → √10, (-2,2) → √8, (5,8) → √89, (0,1) → √1
+* Closest two are: (0,1) and (-2,2)
+
+---
+
+### 💡 Intuition
+
+1. The closer a point is to origin, the smaller its **Euclidean distance**:
+
+   $$
+   \text{distance} = \sqrt{x^2 + y^2}
+   $$
+
+   ✅ We can skip `Math.sqrt()` — since it preserves order.
+
+2. Use a **Max Heap** of size `k`:
+
+   * Push points with their distance.
+   * If heap size > `k`, remove the **farthest** point (max distance).
+   * At the end, the heap will contain the `k` closest points.
+
+---
+
+### ✅ MaxHeap Implementation
+
+```js
+class MaxHeap {
+  constructor(compare) {
+    this.data = [];
+    this.compare = compare;
+  }
+
+  insert(val) {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  extractMax() {
+    if (this.data.length === 0) return null;
+    if (this.data.length === 1) return this.data.pop();
+    const max = this.data[0];
+    this.data[0] = this.data.pop();
+    this.heapifyDown();
+    return max;
+  }
+
+  heapifyUp() {
+    let i = this.data.length - 1;
+    while (i > 0) {
+      let p = Math.floor((i - 1) / 2);
+      if (this.compare(this.data[i], this.data[p]) <= 0) break;
+      [this.data[i], this.data[p]] = [this.data[p], this.data[i]];
+      i = p;
+    }
+  }
+
+  heapifyDown() {
+    let i = 0;
+    const n = this.data.length;
+    while (2 * i + 1 < n) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let largest = i;
+
+      if (left < n && this.compare(this.data[left], this.data[largest]) > 0)
+        largest = left;
+      if (right < n && this.compare(this.data[right], this.data[largest]) > 0)
+        largest = right;
+
+      if (largest === i) break;
+
+      [this.data[i], this.data[largest]] = [this.data[largest], this.data[i]];
+      i = largest;
+    }
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  isEmpty() {
+    return this.data.length === 0;
+  }
+
+  peek() {
+    return this.data[0];
+  }
+}
+```
+
+---
+
+### ✅ Main Function
+
+```js
+function kClosest(points, k) {
+  const dist = ([x, y]) => x * x + y * y;
+
+  const heap = new MaxHeap((a, b) => a[0] - b[0]); // compare by distance
+
+  for (let point of points) {
+    const d = dist(point);
+    heap.insert([d, point]);
+
+    if (heap.size() > k) {
+      heap.extractMax(); // remove farthest
+    }
+  }
+
+  return heap.data.map(entry => entry[1]);
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(kClosest([[1, 3], [-2, 2], [5, 8], [0, 1]], 2));
+// Output: [[-2,2],[0,1]]
+```
+
+---
+
+### 🔄 Heap Trace (visual)
+
+For input: `[[1,3],[-2,2],[5,8],[0,1]], k=2`
+
+Distances (squared):
+
+```
+[10, [1,3]],
+[8, [-2,2]],
+[89, [5,8]],
+[1, [0,1]]
+```
+
+Final heap contains:
+→ \[\[8, \[-2,2]], \[1, \[0,1]]] (k closest)
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step          | Complexity   |
+| ------------- | ------------ |
+| Distance Calc | `O(n)`       |
+| Heap Insert   | `O(log k)`   |
+| Total Time    | `O(n log k)` |
+| Space         | `O(k)`       |
+
+---
+
+### 📌 Summary
+
+| Concept              | Explanation                      |
+| -------------------- | -------------------------------- |
+| Distance Function    | Use x² + y² to compare distances |
+| Max Heap             | Keeps farthest point at top      |
+| Fixed Heap Size      | Only store top k closest points  |
+| Efficient Extraction | Heap ensures O(log k) ops        |
+
+---
+## ✅ **12. Connect Ropes to Minimize Cost**
+
+### 📘 Problem Statement
+
+You're given an array of rope lengths. You need to connect all ropes into **one single rope**.
+Each time you connect two ropes of length `a` and `b`, the cost is `a + b`.
+
+👉 Return the **minimum total cost** to connect all ropes.
+
+---
+
+### 🧪 Example
+
+```js
+Input: [4, 3, 2, 6]
+Output: 29
+```
+
+**Explanation:**
+
+1. Connect 2 + 3 = 5 (cost: 5) → heap: \[4, 5, 6]
+2. Connect 4 + 5 = 9 (cost: 9) → heap: \[6, 9]
+3. Connect 6 + 9 = 15 (cost: 15) → heap: \[15]
+4. Total cost: 5 + 9 + 15 = **29**
+
+---
+
+### 💡 Intuition
+
+This is a **greedy** problem.
+
+* Always connect the **two smallest** ropes first (to minimize the current cost).
+* Repeat until only one rope remains.
+* Use a **Min Heap** to efficiently get the smallest two ropes at each step.
+
+---
+
+### ✅ MinHeap Class
+
+```js
+class MinHeap {
+  constructor(compare) {
+    this.data = [];
+    this.compare = compare || ((a, b) => a - b);
+  }
+
+  insert(val) {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  extractMin() {
+    if (this.data.length === 0) return null;
+    if (this.data.length === 1) return this.data.pop();
+    const min = this.data[0];
+    this.data[0] = this.data.pop();
+    this.heapifyDown();
+    return min;
+  }
+
+  heapifyUp() {
+    let i = this.data.length - 1;
+    while (i > 0) {
+      const p = Math.floor((i - 1) / 2);
+      if (this.compare(this.data[i], this.data[p]) >= 0) break;
+      [this.data[i], this.data[p]] = [this.data[p], this.data[i]];
+      i = p;
+    }
+  }
+
+  heapifyDown() {
+    let i = 0;
+    const n = this.data.length;
+    while (2 * i + 1 < n) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let smallest = i;
+
+      if (left < n && this.compare(this.data[left], this.data[smallest]) < 0)
+        smallest = left;
+      if (right < n && this.compare(this.data[right], this.data[smallest]) < 0)
+        smallest = right;
+
+      if (smallest === i) break;
+      [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
+      i = smallest;
+    }
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  isEmpty() {
+    return this.size() === 0;
+  }
+}
+```
+
+---
+
+### ✅ Main Function
+
+```js
+function connectRopes(ropes) {
+  const heap = new MinHeap();
+
+  // Initialize heap with all ropes
+  for (let rope of ropes) {
+    heap.insert(rope);
+  }
+
+  let totalCost = 0;
+
+  while (heap.size() > 1) {
+    const first = heap.extractMin();
+    const second = heap.extractMin();
+
+    const cost = first + second;
+    totalCost += cost;
+
+    heap.insert(cost); // Insert combined rope back
+  }
+
+  return totalCost;
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(connectRopes([4, 3, 2, 6])); // Output: 29
+console.log(connectRopes([1, 2, 5, 10, 35, 89])); // Output: 224
+```
+
+---
+
+### 🔄 Heap Trace (visual)
+
+For input `[4, 3, 2, 6]`:
+
+1. Heap → \[2, 3, 4, 6]
+2. Connect 2 + 3 = 5 → Insert 5 → \[4, 5, 6]
+3. Connect 4 + 5 = 9 → Insert 9 → \[6, 9]
+4. Connect 6 + 9 = 15 → Insert 15 → \[15]
+   → Total cost: 5 + 9 + 15 = **29**
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step       | Complexity   |
+| ---------- | ------------ |
+| Heap Build | `O(n)`       |
+| N-1 Merges | `O(n log n)` |
+| Space      | `O(n)`       |
+
+---
+
+### 📌 Summary
+
+| Concept              | Explanation                         |
+| -------------------- | ----------------------------------- |
+| Greedy Strategy      | Always merge smallest ropes first   |
+| Min Heap             | Efficient way to get 2 minimums     |
+| Cost Tracking        | Sum of all intermediate merge costs |
+| Optimal Substructure | Locally optimal → globally optimal  |
+
+---
+## ✅ **13. Sum of Two Elements from K1 and K2 Smallest Elements**
+
+### 📘 Problem Statement
+
+Given an array of integers and two integers `k1` and `k2`, find the **sum of all elements that lie between the `k1`-th and `k2`-th smallest elements** in the array.
+
+> ⚠️ Elements are 1-indexed (i.e., the smallest is 1st, next is 2nd...).
+
+---
+
+### 🧪 Example
+
+```js
+Input: arr = [1, 3, 12, 5, 15, 11], k1 = 3, k2 = 6  
+Output: 23
+```
+
+**Explanation:**
+
+* Sorted: \[1, 3, 5, 11, 12, 15]
+* 3rd smallest = 5
+* 6th smallest = 15
+* Elements in between: **\[11, 12]**
+* Sum = 11 + 12 = **23**
+
+---
+
+### 💡 Intuition
+
+* We only care about the elements that are **strictly between** the `k1`-th and `k2`-th smallest.
+* Instead of sorting the full array (`O(n log n)`), we can use a **Min Heap** (`O(n + k log n)`).
+
+---
+
+### ✅ Implementation
+
+```js
+class MinHeap {
+  constructor(compare) {
+    this.data = [];
+    this.compare = compare || ((a, b) => a - b);
+  }
+
+  insert(val) {
+    this.data.push(val);
+    this.heapifyUp();
+  }
+
+  extractMin() {
+    if (this.data.length === 0) return null;
+    if (this.data.length === 1) return this.data.pop();
+
+    const min = this.data[0];
+    this.data[0] = this.data.pop();
+    this.heapifyDown();
+    return min;
+  }
+
+  heapifyUp() {
+    let i = this.data.length - 1;
+    while (i > 0) {
+      const p = Math.floor((i - 1) / 2);
+      if (this.compare(this.data[i], this.data[p]) >= 0) break;
+      [this.data[i], this.data[p]] = [this.data[p], this.data[i]];
+      i = p;
+    }
+  }
+
+  heapifyDown() {
+    let i = 0;
+    const n = this.data.length;
+    while (2 * i + 1 < n) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let smallest = i;
+
+      if (left < n && this.compare(this.data[left], this.data[smallest]) < 0)
+        smallest = left;
+      if (right < n && this.compare(this.data[right], this.data[smallest]) < 0)
+        smallest = right;
+
+      if (smallest === i) break;
+      [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
+      i = smallest;
+    }
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  isEmpty() {
+    return this.size() === 0;
+  }
+}
+```
+
+---
+
+### ✅ Main Function
+
+```js
+function sumBetweenK1K2Smallest(arr, k1, k2) {
+  const heap = new MinHeap();
+
+  for (let num of arr) {
+    heap.insert(num);
+  }
+
+  // Pop k1 smallest elements
+  for (let i = 0; i < k1; i++) heap.extractMin();
+
+  let sum = 0;
+
+  // Sum next (k2 - k1 - 1) elements
+  for (let i = 0; i < k2 - k1 - 1; i++) {
+    if (!heap.isEmpty()) sum += heap.extractMin();
+  }
+
+  return sum;
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(sumBetweenK1K2Smallest([1, 3, 12, 5, 15, 11], 3, 6)); // Output: 23
+console.log(sumBetweenK1K2Smallest([20, 8, 22, 4, 12, 10, 14], 3, 6)); // Output: 26
+```
+
+---
+
+### 🔄 Heap Trace (Visual)
+
+For input: `[1, 3, 12, 5, 15, 11]`, k1 = 3, k2 = 6
+
+1. Heap built → \[1, 3, 5, 11, 12, 15]
+2. Remove first 3: 1, 3, 5
+3. Next two: **11 + 12 = 23**
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step         | Complexity         |
+| ------------ | ------------------ |
+| Build Heap   | `O(n)`             |
+| k1 Pops      | `O(k1 log n)`      |
+| k2−k1−1 Pops | `O((k2-k1) log n)` |
+| Total Time   | `O(n + k log n)`   |
+| Space        | `O(n)`             |
+
+---
+
+### 📌 Summary
+
+| Concept           | Explanation                            |
+| ----------------- | -------------------------------------- |
+| Min Heap          | Efficient way to get smallest elements |
+| Skip k1 smallest  | Discard first k1 elements              |
+| Sum middle values | Only add values between k1 and k2      |
+| Avoid Full Sort   | Faster than full sorting for large `n` |
 
 ---
