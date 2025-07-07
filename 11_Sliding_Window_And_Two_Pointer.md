@@ -1979,4 +1979,103 @@ console.log(numSubseq([2, 3, 3, 4, 6, 7], 12)); // Output: 61
 
 ---
 
-Let me know if you'd like this in Python or C++ as well!
+## 🔢 **6. Maximum Score of a Good Subarray**
+
+### 📘 Problem Statement
+
+You are given an integer array `nums` and an index `k`.
+
+A **good subarray** is a subarray that contains the index `k`.
+The **score** of a subarray is defined as:
+
+```
+score = min(nums[i..j]) * (j - i + 1)
+```
+
+Your goal is to find the **maximum score** among all such good subarrays.
+
+---
+
+### 🧪 Test Cases
+
+#### ✅ Test Case 1
+
+```js
+Input: (nums = [1, 4, 3, 7, 4, 5]), (k = 3);
+Output: 15;
+// Explanation: The subarray [4, 3, 7, 4, 5] includes index 3 and has min = 3 and length = 5 → score = 15
+```
+
+#### ✅ Test Case 2
+
+```js
+Input: (nums = [5, 5, 4, 5, 5]), (k = 2);
+Output: 20;
+// Entire array has min = 4 and length = 5 → score = 20
+```
+
+---
+
+### 💡 Intuition
+
+We want to maximize:
+
+```
+score = min(nums[left..right]) * (right - left + 1)
+```
+
+Where `k` lies within `[left..right]`.
+Use a two-pointer approach that **starts from index `k`** and **expands outward**, tracking the **minimum value** within the current window.
+
+---
+
+### ✅ JavaScript Code
+
+```js
+function maximumScore(nums, k) {
+  let n = nums.length;
+  let left = k,
+    right = k;
+  let minVal = nums[k];
+  let maxScore = minVal;
+
+  while (left > 0 || right < n - 1) {
+    if (left === 0) {
+      right++;
+    } else if (right === n - 1) {
+      left--;
+    } else if (nums[left - 1] >= nums[right + 1]) {
+      left--;
+    } else {
+      right++;
+    }
+
+    minVal = Math.min(minVal, nums[left], nums[right]);
+    maxScore = Math.max(maxScore, minVal * (right - left + 1));
+  }
+
+  return maxScore;
+}
+```
+
+---
+
+### ⏱ Time & Space Complexity
+
+| Metric   | Complexity | Notes                             |
+| -------- | ---------- | --------------------------------- |
+| ⏳ Time  | O(n)       | Expand from `k` to both ends once |
+| 💾 Space | O(1)       | Constant space                    |
+
+---
+
+### 📌 Summary
+
+| Step       | Description                             |
+| ---------- | --------------------------------------- |
+| Start      | Initialize `left = right = k`           |
+| Expand     | Move pointers outward based on values   |
+| Track Min  | Keep the minimum value in window        |
+| Update Max | Use formula: `min * (right - left + 1)` |
+
+---
