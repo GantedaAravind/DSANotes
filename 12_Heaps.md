@@ -1699,3 +1699,552 @@ console.log(topKFrequent([1], 1)); // [1]
 | Output          | Elements with highest frequencies |
 
 ---
+
+## ✅ **7. Maximum Number of Events That Can Be Attended**
+
+### 📘 Problem Statement
+
+You are given a 2D array `events` where each `events[i] = [startDayᵢ, endDayᵢ]`.
+
+- You can attend **at most one event per day**.
+- An event `i` can be attended **on any day `d` such that startDayᵢ ≤ d ≤ endDayᵢ\`.**
+
+Return the **maximum number of events you can attend**.
+
+---
+
+### 🧪 Test Cases
+
+#### ✅ Test Case 1:
+
+```js
+Input: events = [
+  [1, 2],
+  [2, 3],
+  [3, 4],
+];
+Output: 3; // Attend day 1, 2, and 3
+```
+
+#### ✅ Test Case 2:
+
+```js
+Input: events = [
+  [1, 2],
+  [2, 3],
+  [3, 4],
+  [1, 2],
+];
+Output: 4;
+```
+
+#### ✅ Test Case 3:
+
+```js
+Input: events = [
+  [1, 4],
+  [4, 4],
+  [2, 2],
+  [3, 4],
+  [1, 1],
+];
+Output: 4;
+```
+
+---
+
+### 💡 Intuition
+
+This is a **Greedy Scheduling Problem**:
+
+- Always attend the event that ends **earliest** to leave room for more future events.
+- Use a **Min Heap** to keep track of the ending days of active events.
+
+---
+
+### 🧱 MinHeap Class
+
+```js
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  insert(val) {
+    this.heap.push(val);
+    this._heapifyUp();
+  }
+
+  extractMin() {
+    if (this.heap.length === 1) return this.heap.pop();
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this._heapifyDown();
+    return min;
+  }
+
+  peek() {
+    return this.heap[0];
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  _heapifyUp() {
+    let i = this.heap.length - 1;
+    while (i > 0) {
+      let parent = Math.floor((i - 1) / 2);
+      if (this.heap[parent] <= this.heap[i]) break;
+      [this.heap[parent], this.heap[i]] = [this.heap[i], this.heap[parent]];
+      i = parent;
+    }
+  }
+
+  _heapifyDown() {
+    let i = 0;
+    const n = this.heap.length;
+    while (true) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let smallest = i;
+
+      if (left < n && this.heap[left] < this.heap[smallest]) smallest = left;
+      if (right < n && this.heap[right] < this.heap[smallest]) smallest = right;
+
+      if (smallest === i) break;
+      [this.heap[i], this.heap[smallest]] = [this.heap[smallest], this.heap[i]];
+      i = smallest;
+    }
+  }
+}
+```
+
+---
+
+### ✅ Main Function
+
+```js
+function maxEvents(events) {
+  events.sort((a, b) => a[0] - b[0]); // Sort by start day
+  const heap = new MinHeap();
+  let i = 0;
+  let res = 0;
+  const n = events.length;
+  const lastDay = Math.max(...events.map((e) => e[1]));
+
+  for (let day = 1; day <= lastDay; day++) {
+    // Add all events that start today
+    while (i < n && events[i][0] === day) {
+      heap.insert(events[i][1]);
+      i++;
+    }
+
+    // Remove all events that ended before today
+    while (heap.size() && heap.peek() < day) {
+      heap.extractMin();
+    }
+
+    // Attend the event that ends earliest
+    if (heap.size()) {
+      heap.extractMin();
+      res++;
+    }
+  }
+
+  return res;
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(
+  maxEvents([
+    [1, 2],
+    [2, 3],
+    [3, 4],
+  ])
+); // Output: 3
+console.log(
+  maxEvents([
+    [1, 2],
+    [2, 3],
+    [3, 4],
+    [1, 2],
+  ])
+); // Output: 4
+console.log(
+  maxEvents([
+    [1, 4],
+    [4, 4],
+    [2, 2],
+    [3, 4],
+    [1, 1],
+  ])
+); // Output: 4
+```
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step                             | Complexity |
+| -------------------------------- | ---------- |
+| Sorting Events                   | O(n log n) |
+| Heap Operations (insert/extract) | O(n log n) |
+| Space (Heap + Sort)              | O(n)       |
+
+---
+
+### 📌 Summary
+
+| Step             | Description                                |
+| ---------------- | ------------------------------------------ |
+| Sort             | Events by start day                        |
+| MinHeap          | Tracks active events, sorted by end day    |
+| Greedy Selection | Always attend the event that ends earliest |
+
+---
+
+## ✅ **8. Meeting Rooms II**
+
+> "Find the **minimum number of conference rooms required** to hold all meetings without conflicts."
+
+---
+
+### 📘 Problem Statement
+
+Given an array of meeting time intervals `intervals` where:
+
+- `intervals[i] = [startᵢ, endᵢ]`
+- Each meeting has a start and end time
+
+Return the **minimum number of meeting rooms** required so that **no meetings overlap** in a room.
+
+---
+
+### 🧪 Test Cases
+
+#### ✅ Test Case 1:
+
+```js
+Input: [
+  [0, 30],
+  [5, 10],
+  [15, 20],
+];
+Output: 2; // One meeting from 0–30, overlaps with [5,10] and [15,20]
+```
+
+#### ✅ Test Case 2:
+
+```js
+Input: [
+  [7, 10],
+  [2, 4],
+];
+Output: 1; // No overlap
+```
+
+---
+
+### 💡 Intuition
+
+To minimize the number of rooms:
+
+- Sort all meetings by **start time**.
+- Use a **min-heap to track current meeting end times**.
+- At each new meeting:
+
+  - If it starts **after or at** the earliest ending meeting ⇒ reuse room (pop from heap).
+  - Otherwise, allocate a new room (push into heap).
+
+- The **size of the heap** at any time represents the **number of rooms in use**.
+
+---
+
+### 🧱 MinHeap Class
+
+```js
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  insert(val) {
+    this.heap.push(val);
+    this._bubbleUp();
+  }
+
+  extractMin() {
+    if (this.heap.length === 1) return this.heap.pop();
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this._bubbleDown();
+    return min;
+  }
+
+  peek() {
+    return this.heap[0];
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  _bubbleUp() {
+    let i = this.heap.length - 1;
+    while (i > 0) {
+      let parent = Math.floor((i - 1) / 2);
+      if (this.heap[parent] <= this.heap[i]) break;
+      [this.heap[parent], this.heap[i]] = [this.heap[i], this.heap[parent]];
+      i = parent;
+    }
+  }
+
+  _bubbleDown() {
+    let i = 0,
+      n = this.heap.length;
+    while (true) {
+      let left = 2 * i + 1;
+      let right = 2 * i + 2;
+      let smallest = i;
+
+      if (left < n && this.heap[left] < this.heap[smallest]) smallest = left;
+      if (right < n && this.heap[right] < this.heap[smallest]) smallest = right;
+      if (smallest === i) break;
+
+      [this.heap[i], this.heap[smallest]] = [this.heap[smallest], this.heap[i]];
+      i = smallest;
+    }
+  }
+}
+```
+
+---
+
+### ✅ Main Function: `minMeetingRooms`
+
+```js
+function minMeetingRooms(intervals) {
+  if (!intervals.length) return 0;
+
+  // Step 1: Sort meetings by start time
+  intervals.sort((a, b) => a[0] - b[0]);
+
+  const heap = new MinHeap();
+  heap.insert(intervals[0][1]); // First meeting's end time
+
+  for (let i = 1; i < intervals.length; i++) {
+    let currStart = intervals[i][0];
+    let currEnd = intervals[i][1];
+
+    // Step 2: If room is free (meeting has ended)
+    if (currStart >= heap.peek()) {
+      heap.extractMin(); // reuse room
+    }
+
+    // Step 3: Allocate (or reuse) room
+    heap.insert(currEnd);
+  }
+
+  return heap.size(); // Number of rooms in use
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+console.log(
+  minMeetingRooms([
+    [0, 30],
+    [5, 10],
+    [15, 20],
+  ])
+); // Output: 2
+console.log(
+  minMeetingRooms([
+    [7, 10],
+    [2, 4],
+  ])
+); // Output: 1
+console.log(
+  minMeetingRooms([
+    [1, 5],
+    [2, 6],
+    [3, 7],
+  ])
+); // Output: 3
+```
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step                | Complexity |
+| ------------------- | ---------- |
+| Sorting             | O(n log n) |
+| Heap operations     | O(n log n) |
+| Space (heap + sort) | O(n)       |
+
+---
+
+### 📌 Summary
+
+| Step       | Description                             |
+| ---------- | --------------------------------------- |
+| Sort       | Meetings by start time                  |
+| Min Heap   | Track current meeting end times         |
+| Reuse Room | If current start ≥ earliest end in heap |
+| Result     | Heap size = Min number of rooms needed  |
+
+---
+
+## ✅ **9. Minimum Number of Platforms Required**
+
+### 📘 Problem Statement
+
+You're given:
+
+- An array of **arrival times**
+- An array of **departure times**
+
+Each pair represents a train's schedule. You need to find the **minimum number of platforms** needed so that **no train waits**.
+
+---
+
+### 🧪 Example
+
+```js
+Arrival: [900, 940, 950, 1100, 1500, 1800];
+Departure: [910, 1200, 1120, 1130, 1900, 2000];
+
+Output: 3;
+```
+
+Explanation:
+
+- At time `950`, three trains are at the station: \[900–910], \[940–1200], \[950–1120]
+- Hence, 3 platforms are needed at peak.
+
+---
+
+### Event-Based Sorting Approach
+
+### 💡 Intuition
+
+1. Treat all arrival and departure times as **events**:
+
+   - Arrival → `+1` platform needed
+   - Departure → `-1` platform freed
+
+2. Sort all events by time.
+
+   - If two events have the same time:
+
+     - **Departure comes before arrival**, to **free** platform before requiring a new one.
+
+3. Traverse events, maintaining the current count of platforms in use.
+
+---
+
+### ✅ Implementation
+
+```js
+function minPlatforms(arr, dep) {
+  const events = [];
+
+  // Create event tuples: [time, type]
+  for (let i = 0; i < arr.length; i++) {
+    events.push([arr[i], "arr"]);
+    events.push([dep[i], "dep"]);
+  }
+
+  // Sort by time. For same time, dep before arr
+  events.sort((a, b) => {
+    if (a[0] === b[0]) {
+      return a[1] === "dep" ? -1 : 1; // departure first
+    }
+    return a[0] - b[0];
+  });
+
+  let platforms = 0;
+  let maxPlatforms = 0;
+
+  for (let [time, type] of events) {
+    if (type === "arr") {
+      platforms++;
+      maxPlatforms = Math.max(maxPlatforms, platforms);
+    } else {
+      platforms--;
+    }
+  }
+
+  return maxPlatforms;
+}
+```
+
+---
+
+### ✅ Sample Usage
+
+```js
+const arr = [900, 940, 950, 1100, 1500, 1800];
+const dep = [910, 1200, 1120, 1130, 1900, 2000];
+
+console.log(minPlatforms(arr, dep)); // Output: 3
+```
+
+---
+
+### 🔄 Sorted `events` list (for visualization)
+
+For the above test case:
+
+```js
+events = [
+  [900, "arr"],
+  [910, "dep"],
+  [940, "arr"],
+  [950, "arr"],
+  [1120, "dep"],
+  [1130, "dep"],
+  [1100, "arr"],
+  [1200, "dep"],
+  [1500, "arr"],
+  [1800, "arr"],
+  [1900, "dep"],
+  [2000, "dep"],
+];
+```
+
+(Sorted to handle dep before arr at same timestamp)
+
+---
+
+### ⏱️ Time & Space Complexity
+
+| Step           | Complexity   |
+| -------------- | ------------ |
+| Event Creation | `O(n)`       |
+| Sorting Events | `O(n log n)` |
+| Traversal      | `O(n)`       |
+| Space          | `O(n)`       |
+
+---
+
+### 📌 Summary
+
+| Concept              | Explanation                         |
+| -------------------- | ----------------------------------- |
+| Event Points         | Create `[time, type]` for arr/dep   |
+| Sorting Order        | Sort by time, dep before arr on tie |
+| Sweep Line           | Simulate platform usage dynamically |
+| Max Platforms Needed | Track max during the sweep          |
+
+---
