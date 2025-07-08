@@ -984,7 +984,7 @@ i = 3 → min(30 + |20 - 40|, 20 + |20 - 30|) = min(50, 30) = 30
 
 ### 📘 Problem Statement
 
-A frog is at the 0th stair and wants to reach the `n-1`th stair. The frog can jump to any of the next **`k` stairs** (i.e., `i+1` to `i+k`) in a single move.
+A frog is at the 0th stair and wants to reach the `(n-1)`th stair. The frog can jump from stair `i` to any stair in the range `i+1` to `i+k`.
 
 The cost to jump from stair `i` to stair `j` is:
 
@@ -992,7 +992,7 @@ The cost to jump from stair `i` to stair `j` is:
 abs(height[i] - height[j])
 ```
 
-Return the **minimum total cost** to reach the last stair (i.e., `n-1`).
+Return the **minimum total cost** to reach the last stair.
 
 ---
 
@@ -1003,10 +1003,7 @@ Return the **minimum total cost** to reach the last stair (i.e., `n-1`).
 ```txt
 Input: height = [10, 30, 40, 50, 20], k = 3
 Output: 30
-Explanation:
-0 → 2 → 4
-Cost = |10 - 40| + |40 - 20| = 30 + 20 = 50
-But 0 → 1 → 4 is better: |10 - 30| + |30 - 20| = 20 + 10 = 30 ✅
+Explanation: 0 → 1 → 4 → Cost = 20 + 10 = 30 ✅
 ```
 
 #### ✅ Test Case 2:
@@ -1014,8 +1011,7 @@ But 0 → 1 → 4 is better: |10 - 30| + |30 - 20| = 20 + 10 = 30 ✅
 ```txt
 Input: height = [10, 20, 10], k = 2
 Output: 0
-Explanation:
-Jump from 0 → 2: |10 - 10| = 0 ✅
+Explanation: 0 → 2 → Cost = 0 ✅
 ```
 
 #### ✅ Test Case 3:
@@ -1027,15 +1023,44 @@ Output: 30
 
 ---
 
-### 🚀 Approach 1: Memoization (Top-Down DP)
+### ✅ Approach 1: Naive Recursion (No Memoization)
 
 #### 🧠 Intuition
 
-From stair `i`, try all jumps to stairs in range `i-1, i-2, ..., i-k`. Choose the minimum cost path.
+Try all possible jump paths recursively. From stair `n`, the frog can come from `n-1`, `n-2`, ..., `n-k`. Recursively compute the cost for all valid jumps.
 
-We store already-computed results to avoid recomputation.
+#### 📘 Code
+
+```js
+function frogJump(n, height, k) {
+  if (n === 0) return 0;
+
+  let minCost = Infinity;
+
+  for (let j = 1; j <= k; j++) {
+    if (n - j >= 0) {
+      let jumpCost =
+        frogJump(n - j, height, k) + Math.abs(height[n] - height[n - j]);
+      minCost = Math.min(minCost, jumpCost);
+    }
+  }
+
+  return minCost;
+}
+```
+
+#### ⏱ Complexity
+
+- **Time**: ❌ O(kⁿ) — exponential time due to recomputation
+- **Space**: O(n) — due to recursion stack
 
 ---
+
+### ✅ Approach 2: Memoization (Top-Down DP)
+
+#### 🧠 Intuition
+
+Same as the recursive approach, but **store already computed results** in a `dp` array to avoid recomputation.
 
 #### 📘 Code
 
@@ -1058,40 +1083,24 @@ function frogJump(n, height, k, dp = []) {
 }
 ```
 
-🧪 **Call it like:**
+#### 🧪 Call It Like:
 
 ```js
 frogJump(height.length - 1, height, k);
 ```
 
----
-
-#### 🔍 Dry Run: `height = [10, 40, 30, 20], k = 2`
-
-```
-→ frogJump(3)
-   → try jumps from (3-1)=2 and (3-2)=1
-   → frogJump(2) and frogJump(1)
-   → each of them recursively computes sub-results
-→ Store results in dp to avoid recomputation
-```
-
----
-
 #### ⏱ Complexity
 
-- **Time**: O(n \* k)
-- **Space**: O(n) (memo + recursion stack)
+- **Time**: ✅ O(n × k)
+- **Space**: O(n) (dp + recursion stack)
 
 ---
 
-### 🧮 Approach 2: Tabulation (Bottom-Up DP)
+### ✅ Approach 3: Tabulation (Bottom-Up DP)
 
 #### 🧠 Intuition
 
-Build from `0` to `n-1`, and for each step, check up to `k` previous steps.
-
----
+Instead of starting from the top and going down recursively, we build the solution **from the base up** using iteration.
 
 #### 📘 Code
 
@@ -1113,47 +1122,33 @@ function frogJump(n, height, k) {
 }
 ```
 
----
-
-#### 🔍 Dry Run: `height = [10, 40, 30, 20], k = 2`
-
-```
-dp[0] = 0
-
-i = 1 → dp[1] = min(dp[0] + |40 - 10|) = 30
-i = 2 → dp[2] = min(dp[1] + |30 - 40|, dp[0] + |30 - 10|) = min(30 + 10, 0 + 20) = 20
-i = 3 → dp[3] = min(dp[2] + |20 - 30|, dp[1] + |20 - 40|) = min(20 + 10, 30 + 20) = 30
-
-Answer = dp[3] = 30 ✅
-```
-
----
-
 #### ⏱ Complexity
 
-- **Time**: O(n \* k)
+- **Time**: ✅ O(n × k)
 - **Space**: O(n)
 
 ---
 
-### 🧊 Approach 3: Space Optimization
+### ✅ Approach 4: Space Optimization
 
 #### 🧠 Intuition
 
-We can try space optimization **only if** `k` is very small. In general, we need O(n) space for the DP because we might need any of the last `k` states.
+You might think to reduce space by only keeping track of the last `k` computed values instead of the entire `dp` array.
 
-✅ So for `k` = small constant (like 2), it’s possible.
-❌ But in general case (k not fixed), **space optimization is not meaningful**.
+> ⚠️ This works **only if `k` is small and fixed**.
+
+If `k` can be large or variable, **you need the full `dp[]`**, because any of the previous `k` values might be needed.
 
 ---
 
-### 📌 Summary Table
+### 🧮 Summary Table
 
-| Approach            | Time   | Space | Notes                              |
-| ------------------- | ------ | ----- | ---------------------------------- |
-| Memoization (Top)   | O(n·k) | O(n)  | Caches results, recursive          |
-| Tabulation (Bottom) | O(n·k) | O(n)  | Best for clarity + performance     |
-| Space Optimization  | O(n·k) | O(n)  | Can't go below O(n) due to K jumps |
+| Approach               | Time Complexity | Space Complexity | Notes                                |
+| ---------------------- | --------------- | ---------------- | ------------------------------------ |
+| Naive Recursion        | ❌ O(kⁿ)        | O(n)             | Exponential — slow for large `n`     |
+| Memoization (Top-Down) | ✅ O(n × k)     | O(n)             | Best for recursion lovers            |
+| Tabulation (Bottom-Up) | ✅ O(n × k)     | O(n)             | Best for clarity and performance     |
+| Space Optimization     | ⚠️ O(n × k)     | ⚠️ O(n) or less  | Only useful if `k` is small or fixed |
 
 ---
 
