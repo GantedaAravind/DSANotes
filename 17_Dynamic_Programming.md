@@ -3627,7 +3627,7 @@ We only need the next row → we can use `2 × c × c` arrays.
 
 # DP On SubSequences
 
-## 🔢 **1. Subset Sum Equal to Target **
+## 🔢 **1. Subset Sum Equal to Target**
 
 ### 📘 Problem Statement
 
