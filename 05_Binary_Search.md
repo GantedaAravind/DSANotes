@@ -1855,7 +1855,162 @@ console.log(findPeakElement([5, 10, 20, 15])); // Output: 2
 
 ---
 
-## 13. **Search in Infinite Sorted Array**
+## 13. **Find Element in Mountain Array**
+
+### 🔍 Problem Statement
+
+You are given a **mountain array** `arr[]` and a `target` integer. Return the **index** of `target` in the array.
+
+If it is **not present**, return `-1`.
+
+📌 A **mountain array** is defined as:
+
+- Elements **strictly increase** to a peak
+- Then **strictly decrease** after the peak
+
+🧠 Think of it as:
+
+```
+Increasing → Peak → Decreasing
+```
+
+---
+
+### 🧪 Examples
+
+#### Example 1:
+
+```
+Input: arr = [1, 3, 5, 7, 6, 4, 2], target = 6
+Output: 4
+```
+
+#### Example 2:
+
+```
+Input: arr = [0, 2, 4, 3, 1], target = 3
+Output: 3
+```
+
+#### Example 3:
+
+```
+Input: arr = [0, 5, 10, 7, 3], target = 8
+Output: -1
+```
+
+---
+
+### 🧠 Intuition
+
+1. **Find the peak** (index of max element) using binary search
+2. **Binary Search** on the **increasing side** (0 to peak)
+3. If not found, **Binary Search** on the **decreasing side** (peak to end)
+
+All steps use **O(log N)** time.
+
+---
+
+### 🧵 Dry Run
+
+```text
+arr = [1, 3, 5, 7, 6, 4, 2], target = 6
+
+1️⃣ Peak Search:
+  low = 0, high = 6
+  mid = 3 → 7 > 6 → move left → high = 3
+  mid = 1 → 3 < 5 → move right → low = 2
+  mid = 2 → 5 < 7 → move right → low = 3
+  Peak at index 3 (value = 7)
+
+2️⃣ Search in [0..3]:
+  Binary search → target = 6 → not found
+
+3️⃣ Search in [4..6]:
+  Binary search in descending → found 6 at index 4
+```
+
+---
+
+### 💻 JavaScript Code
+
+```javascript
+function findInMountainArray(target, arr) {
+  const peakIndex = findPeak(arr);
+
+  const left = binarySearch(arr, target, 0, peakIndex, true);
+  if (left !== -1) return left;
+
+  return binarySearch(arr, target, peakIndex + 1, arr.length - 1, false);
+}
+
+// Find peak index (max element) using binary search
+function findPeak(arr) {
+  let low = 0,
+    high = arr.length - 1;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (arr[mid] < arr[mid + 1]) {
+      low = mid + 1; // Ascending slope
+    } else {
+      high = mid; // Descending slope
+    }
+  }
+  return low;
+}
+
+// Binary search for ascending/descending order
+function binarySearch(arr, target, low, high, ascending) {
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    if (arr[mid] === target) return mid;
+
+    if (ascending) {
+      if (target < arr[mid]) high = mid - 1;
+      else low = mid + 1;
+    } else {
+      if (target > arr[mid]) high = mid - 1;
+      else low = mid + 1;
+    }
+  }
+  return -1;
+}
+```
+
+---
+
+#### ✅ Usage
+
+```javascript
+console.log(findInMountainArray(6, [1, 3, 5, 7, 6, 4, 2])); // Output: 4
+console.log(findInMountainArray(3, [0, 2, 4, 3, 1])); // Output: 3
+console.log(findInMountainArray(8, [0, 5, 10, 7, 3])); // Output: -1
+```
+
+---
+
+### ⏱ Time & Space Complexity
+
+| Metric           | Value    |
+| ---------------- | -------- |
+| Time Complexity  | O(log N) |
+| Space Complexity | O(1)     |
+
+---
+
+### 📌 Summary
+
+| Feature      | Description                             |
+| ------------ | --------------------------------------- |
+| Input        | Mountain array `arr[]`, number `target` |
+| Output       | Index of target, or -1 if not found     |
+| Constraints  | Strictly increasing → peak → decreasing |
+| Core Concept | Binary Search in both halves            |
+| Use Cases    | Terrain analysis, unimodal search       |
+
+---
+
+## 14. **Search in Infinite Sorted Array**
 
 ### 🔍 Problem Statement
 
