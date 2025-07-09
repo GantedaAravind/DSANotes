@@ -4437,6 +4437,8 @@ l1 = 6, l2 = 4, r1 = 7, r2 = 8
 
 ### ✅ There are **TWO Major Variants**:
 
+> Note: When Searching, please Try to reduce the Search Space
+
 ### 💡 **Variant 1: Row-wise & Column-wise Sorted**
 
 **Matrix Property:**
