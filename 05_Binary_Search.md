@@ -119,6 +119,95 @@ function binarySearchRecursive(arr, target, low = 0, high = arr.length - 1) {
 
 ---
 
+## 🔍 What is Order-Agnostic Binary Search?
+
+**Order-Agnostic Binary Search** is a binary search algorithm that works **whether the array is sorted in ascending or descending order**.
+
+> It first detects the sort order and then applies the correct comparison logic.
+
+---
+
+### 📦 Use Case
+
+You're given a **sorted array** (either ascending or descending) and a **target value**. Your goal is to find the **index** of the target or return `-1` if not found.
+
+---
+
+### ✅ Steps
+
+1. **Detect sort order**: Compare `arr[0]` and `arr[end]`
+2. **Perform binary search**:
+
+   - Adjust comparison based on the order:
+
+     - Ascending → `target < arr[mid]`
+     - Descending → `target > arr[mid]`
+
+---
+
+### 💡 JavaScript Implementation
+
+```js
+function orderAgnosticBinarySearch(arr, target) {
+  let start = 0;
+  let end = arr.length - 1;
+
+  // Step 1: Check if ascending or descending
+  let isAscending = arr[start] < arr[end];
+
+  while (start <= end) {
+    let mid = Math.floor(start + (end - start) / 2);
+
+    if (arr[mid] === target) {
+      return mid;
+    }
+
+    if (isAscending) {
+      // Ascending order
+      if (target < arr[mid]) {
+        end = mid - 1;
+      } else {
+        start = mid + 1;
+      }
+    } else {
+      // Descending order
+      if (target > arr[mid]) {
+        end = mid - 1;
+      } else {
+        start = mid + 1;
+      }
+    }
+  }
+
+  return -1; // not found
+}
+```
+
+---
+
+### 📦 Example 1 – Ascending
+
+```js
+orderAgnosticBinarySearch([1, 3, 5, 7, 9, 11], 7);
+// ➤ Output: 3
+```
+
+### 📦 Example 2 – Descending
+
+```js
+orderAgnosticBinarySearch([100, 80, 60, 40, 20], 60);
+// ➤ Output: 2
+```
+
+---
+
+### ⏱️ Time and Space Complexity
+
+- **Time Complexity**: `O(log n)` – Same as standard binary search.
+- **Space Complexity**: `O(1)` – Iterative, constant space.
+
+---
+
 # **Binary Search on 1D Arrays**
 
 ## 1. **Lower Bound using Binary Search**
