@@ -275,3 +275,173 @@ var kthCharacter = function (k, operations) {
 - We only care about **how many transforms (operation = 1)** were encountered.
 
 ---
+
+Here are **clean DSA-style notes** in the exact format you asked for, matching the style of the `"K-th Character After Sequence of Copy and Transform Operations"` explanation.
+
+---
+
+# 09-07-25
+
+## 🧮 **Maximize Free Time by Rescheduling Meetings**
+
+### 📘 **Problem Statement**
+
+You are given:
+
+- An integer `eventTime` representing the full duration of an event (`0` to `eventTime`).
+- Two arrays:
+
+  - `startTime[]`: Start times of `n` **non-overlapping meetings**.
+  - `endTime[]`: End times of those meetings.
+
+You can **reschedule at most `k` meetings**, while preserving:
+
+- Same **duration** of each meeting.
+- **Relative order** of meetings.
+- No **overlap**.
+- Meetings must stay **within event time**.
+
+🔁 **Goal**: Reschedule up to `k` meetings to **maximize the longest continuous free time** during the event.
+
+---
+
+### 🧪 **Test Cases**
+
+**Test Case 1:**
+
+```js
+Input: (eventTime = 5), (k = 1), (startTime = [1, 3]), (endTime = [2, 5]);
+Output: 2;
+```
+
+➡️ Reschedule `[1, 2]` to `[2, 3]` → free time from `0 to 2` = **2**
+
+---
+
+**Test Case 2:**
+
+```js
+Input: (eventTime = 10),
+  (k = 1),
+  (startTime = [0, 2, 9]),
+  (endTime = [1, 4, 10]);
+Output: 6;
+```
+
+➡️ Reschedule `[2, 4]` to `[1, 3]` → free time from `3 to 9` = **6**
+
+---
+
+**Test Case 3:**
+
+```js
+Input: (eventTime = 5),
+  (k = 2),
+  (startTime = [0, 1, 2, 3, 4]),
+  (endTime = [1, 2, 3, 4, 5]);
+Output: 0;
+```
+
+➡️ No room to move → **no free gap**
+
+---
+
+### 💡 **Key Insight**
+
+Rather than trying all permutations:
+
+- Meetings must **stay in order** and **not overlap**.
+- Only **k meetings** can be moved.
+- Try to find **longest continuous gap** between meetings by trying different subsets.
+
+So:
+
+- You calculate the **gaps between meetings** and the trailing free time after the last one.
+- Since each rescheduled meeting can potentially **merge two adjacent gaps**, rescheduling `k` meetings gives `k + 1` such segments.
+- Using a **sliding window** of size `k + 1`, you find the **maximum sum** of consecutive free time segments.
+
+---
+
+### ✅ **JavaScript Code (Sliding Window Approach)**
+
+```javascript
+/**
+ * @param {number} eventTime
+ * @param {number} k
+ * @param {number[]} startTime
+ * @param {number[]} endTime
+ * @return {number}
+ */
+var maxFreeTime = function (eventTime, k, startTime, endTime) {
+  let freespace = getFreeSpaces(startTime, endTime, eventTime);
+  let maxFreeTime = getMaxSumOfWindowLength(freespace, k + 1);
+  return maxFreeTime;
+};
+
+/**
+ * Finds all free intervals between meetings and after last meeting.
+ * @param {number[]} startTime
+ * @param {number[]} endTime
+ * @param {number} eventTime
+ * @returns {number[]} Array of free durations
+ */
+function getFreeSpaces(startTime, endTime, eventTime) {
+  let prevEnd = 0;
+  let freeSpaces = [];
+
+  for (let i = 0; i < startTime.length; i++) {
+    freeSpaces.push(startTime[i] - prevEnd);
+    prevEnd = endTime[i];
+  }
+
+  // Add space after the last meeting
+  freeSpaces.push(eventTime - prevEnd);
+  return freeSpaces;
+}
+
+/**
+ * Sliding window to find max sum of any k+1 contiguous free segments.
+ * @param {number[]} nums - Free time segments
+ * @param {number} k - Window size (k+1 gaps for k reschedules)
+ * @returns {number}
+ */
+function getMaxSumOfWindowLength(nums, k) {
+  let sum = 0;
+  let maxSum = 0;
+
+  for (let right = 0; right < nums.length; right++) {
+    sum += nums[right];
+    if (right - k >= 0) {
+      sum -= nums[right - k];
+    }
+    maxSum = Math.max(maxSum, sum);
+  }
+
+  return maxSum;
+}
+```
+
+---
+
+### 💡 **Key Idea**
+
+---
+
+### ⏱ **Time & Space Complexity**
+
+| Metric | Value |
+| ------ | ----- |
+| Time   | O(n)  |
+| Space  | O(n)  |
+
+---
+
+### 📌 **Summary Table**
+
+| Concept              | Explanation                                            |
+| -------------------- | ------------------------------------------------------ |
+| `getFreeSpaces()`    | Finds gaps between meetings + final free segment       |
+| Sliding Window (k+1) | Simulates merging `k` meetings to unlock `k+1` gaps    |
+| Maximize Free Time   | Search for max contiguous sum of `k + 1` free segments |
+
+---
