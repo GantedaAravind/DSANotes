@@ -1855,6 +1855,139 @@ console.log(findPeakElement([5, 10, 20, 15])); // Output: 2
 
 ---
 
+## 13. **Search in Infinite Sorted Array**
+
+### 🔍 Problem Statement
+
+You are given an array-like structure `nums[]` that is **sorted in ascending order** and is **infinitely long** (you cannot access its length).
+
+Your task is to find the **position of a target element**.
+
+📌 Assumptions:
+
+- You are given a function `get(index)` which returns the element at index `i`.
+- If `index` is out of bounds (past the real array size), it returns **infinity** (`∞`).
+- The array is sorted with **distinct** elements.
+
+Return the **index** of the target element, or `-1` if not found.
+
+---
+
+### 🧪 Examples
+
+#### Example 1:
+
+```
+Input: nums = [1, 3, 5, 7, 9, 10, 13, 15, 20, 25, ...]
+       target = 10
+Output: 5
+```
+
+#### Example 2:
+
+```
+Input: nums = [1, 2, 3, 4, 5, 6, 7, 8, ...], target = 100
+Output: -1
+```
+
+---
+
+### 🧠 Intuition
+
+Since we **cannot access length**, we use **exponential search** to find a **search range**:
+
+1. Start with a window `[start = 0, end = 1]`
+2. Expand the window **exponentially** (`end *= 2`) until:
+
+   - `get(end) >= target`
+
+Then apply **Binary Search** inside the found range `[start, end]`.
+
+---
+
+### 🧵 Dry Run
+
+```text
+target = 15
+nums = [1, 3, 5, 7, 9, 10, 13, 15, 20, ...]
+
+Start = 0, End = 1 → get(1) = 3 < 15 → expand: start = 1, end = 2
+get(2) = 5 < 15 → expand: start = 2, end = 4
+get(4) = 9 < 15 → expand: start = 4, end = 8
+get(8) = 20 > 15 → Now binary search in [4, 8]
+
+mid = 6 → get(6) = 13 < 15 → start = 7
+mid = 7 → get(7) = 15 == target → return 7
+```
+
+---
+
+### 💻 JavaScript Code
+
+```javascript
+function searchInfiniteArray(get, target) {
+  let start = 0;
+  let end = 1;
+
+  // Expand window
+  while (get(end) < target) {
+    start = end;
+    end *= 2;
+  }
+
+  // Binary Search
+  while (start <= end) {
+    const mid = Math.floor((start + end) / 2);
+    const midVal = get(mid);
+
+    if (midVal === target) return mid;
+    else if (midVal > target) end = mid - 1;
+    else start = mid + 1;
+  }
+
+  return -1;
+}
+```
+
+---
+
+#### ✅ Usage
+
+```javascript
+// Simulate get() API
+const arr = [1, 3, 5, 7, 9, 10, 13, 15, 20, 25];
+const get = (i) => (i < arr.length ? arr[i] : Infinity);
+
+console.log(searchInfiniteArray(get, 15)); // Output: 7
+console.log(searchInfiniteArray(get, 100)); // Output: -1
+console.log(searchInfiniteArray(get, 1)); // Output: 0
+console.log(searchInfiniteArray(get, 25)); // Output: 9
+```
+
+---
+
+### ⏱ Time & Space Complexity
+
+| Metric           | Value                  |
+| ---------------- | ---------------------- |
+| Time Complexity  | O(log P)               |
+|                  | P = position of target |
+| Space Complexity | O(1)                   |
+
+---
+
+### 📌 Summary
+
+| Feature      | Description                                 |
+| ------------ | ------------------------------------------- |
+| Input        | Sorted **infinite** array + target          |
+| Output       | Index of target or `-1`                     |
+| Constraints  | No `.length` allowed, use `get(index)` API  |
+| Core Concept | **Exponential Search** + Binary Search      |
+| Use Cases    | Streaming data, paginated APIs, large files |
+
+---
+
 # **Binary Search on Answers**
 
 ### 📘 What is Binary Search on Answers?
