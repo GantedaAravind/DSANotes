@@ -280,6 +280,213 @@ Here are **clean DSA-style notes** in the exact format you asked for, matching t
 
 ---
 
+# 08-07-25
+
+## 🧠 **Attend The Maximum Number Of Events**
+
+You’re given a list of events:
+
+```js
+events[i] = [startDay, endDay];
+```
+
+You can attend **one event per day**, and for each event you can choose **any day between `startDay` and `endDay`** (inclusive) to attend.
+
+🎯 Your goal is to **attend the maximum number of events**.
+
+---
+
+### 🧪 Example
+
+```txt
+Input: events = [[1,2], [2,3], [3,4]]
+Output: 3
+Explanation:
+Attend one event on day 1, one on day 2, and one on day 3.
+```
+
+---
+
+### ✅ **Approach: Greedy + Min Heap**
+
+### 🔍 Key Insight
+
+We want to always attend the event that ends **earliest**, to keep future days available for events with tighter schedules.
+
+### ⚙️ Steps
+
+1. Sort the events by start day.
+2. Use a **min-heap (priority queue)** to always pick the event that ends earliest.
+3. Iterate over each day from the first to the last possible event day:
+
+   - Add all events starting **today** to the heap.
+   - Remove events from the heap that have **already expired**.
+   - If any events are available today, attend the one that ends earliest (i.e., pop from heap).
+   - Move to next day.
+
+---
+
+### ✅ **Full Code: Max Events with MinHeap**
+
+```js
+// MinHeap class for efficiently getting the event with the earliest end day
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  insert(val) {
+    this.heap.push(val);
+    this._heapifyUp();
+  }
+
+  extractMin() {
+    if (this.heap.length === 0) return null;
+    const min = this.heap[0];
+    const end = this.heap.pop();
+    if (this.heap.length > 0) {
+      this.heap[0] = end;
+      this._heapifyDown();
+    }
+    return min;
+  }
+
+  peek() {
+    return this.heap[0] ?? null;
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  _heapifyUp() {
+    let idx = this.heap.length - 1;
+    while (idx > 0) {
+      let parent = Math.floor((idx - 1) / 2);
+      if (this.heap[parent] <= this.heap[idx]) break;
+      [this.heap[parent], this.heap[idx]] = [this.heap[idx], this.heap[parent]];
+      idx = parent;
+    }
+  }
+
+  _heapifyDown() {
+    let idx = 0;
+    const len = this.heap.length;
+
+    while (true) {
+      let left = 2 * idx + 1;
+      let right = 2 * idx + 2;
+      let smallest = idx;
+
+      if (left < len && this.heap[left] < this.heap[smallest]) smallest = left;
+      if (right < len && this.heap[right] < this.heap[smallest])
+        smallest = right;
+
+      if (smallest === idx) break;
+
+      [this.heap[smallest], this.heap[idx]] = [
+        this.heap[idx],
+        this.heap[smallest],
+      ];
+      idx = smallest;
+    }
+  }
+}
+```
+
+---
+
+### 🚀 **Main Function: `maxEvents()`**
+
+```js
+function maxEvents(events) {
+  // Step 1: Sort events by start day
+  events.sort((a, b) => a[0] - b[0]);
+
+  const heap = new MinHeap();
+  let day = 1;
+  let eventIndex = 0;
+  let attended = 0;
+  const maxDay = Math.max(...events.map((e) => e[1]));
+
+  // Step 2: Simulate each day
+  while (day <= maxDay) {
+    // Step 3: Push all events that start today into the heap
+    while (eventIndex < events.length && events[eventIndex][0] === day) {
+      heap.insert(events[eventIndex][1]); // Insert endDay
+      eventIndex++;
+    }
+
+    // Step 4: Remove all expired events
+    while (heap.size() > 0 && heap.peek() < day) {
+      heap.extractMin();
+    }
+
+    // Step 5: Attend the event with earliest end day
+    if (heap.size() > 0) {
+      heap.extractMin(); // Attend this event
+      attended++;
+    }
+
+    day++;
+  }
+
+  return attended;
+}
+```
+
+---
+
+### 🧪 Example Usage
+
+```js
+console.log(
+  maxEvents([
+    [1, 2],
+    [2, 3],
+    [3, 4],
+  ])
+); // Output: 3
+console.log(
+  maxEvents([
+    [1, 2],
+    [1, 2],
+    [1, 6],
+    [2, 3],
+  ])
+); // Output: 4
+console.log(
+  maxEvents([
+    [1, 4],
+    [4, 4],
+    [2, 2],
+    [3, 4],
+  ])
+); // Output: 4
+```
+
+---
+
+### ⏱ Time Complexity
+
+- Sorting: **O(n log n)**
+- Each event is pushed and popped once → **O(n log n)** using proper heap
+
+> Total: **O(n log n)**
+> Space: **O(n)** for the heap
+
+---
+
+### 📌 Summary
+
+| Technique | Description                                      |
+| --------- | ------------------------------------------------ |
+| Greedy    | Always attend the soonest-ending event available |
+| Min-Heap  | Pick event with smallest `endDay` at each step   |
+| Sort      | Sort by `startDay` first                         |
+
+---
+
 # 09-07-25
 
 ## 🧮 **Maximize Free Time by Rescheduling Meetings**

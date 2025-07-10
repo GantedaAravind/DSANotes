@@ -119,3 +119,103 @@
 - Deque: Sliding window max/min, LRU cache.
 
 ---
+
+## ✅ **Golden Rule of Thumb**
+
+> **1 second ≈ 10⁷ to 10⁸ operations** is safe in most online judges (like LeetCode).
+
+This lets you **estimate which time complexity is safe**, based on input size.
+
+---
+
+### 🧮 Reference Table (Input Size vs Time Complexity)
+
+| Max Input Size (`n`) | Safe Time Complexity          | Unsafe / TLE Risk  |
+| -------------------- | ----------------------------- | ------------------ |
+| ≤ 10                 | O(n!), O(2ⁿ), O(n³)           | —                  |
+| ≤ 20                 | O(2ⁿ), O(n!)                  | —                  |
+| ≤ 100                | ✅ O(n²)                      | ⚠️ O(n³), O(2ⁿ)    |
+| ≤ 1,000              | ✅ O(n²)                      | ⚠️ O(n³)           |
+| ≤ 10⁴                | ✅ O(n·log n), O(n²) (barely) | ⚠️ O(n²) may TLE   |
+| ≤ 10⁵                | ✅ O(n·log n), O(n)           | ❌ O(n²) will TLE  |
+| ≤ 10⁶                | ✅ O(n), O(n·log n)           | ❌ O(n²), O(n¹․⁵)  |
+| ≤ 10⁷ or more        | ✅ O(n) only (linear)         | ❌ Anything slower |
+
+---
+
+### 🚦 How to Use This?
+
+#### Step 1: Read the constraints.
+
+For example:
+
+```txt
+1 <= nums.length <= 10⁵
+```
+
+That tells you:
+
+- **n is up to 10⁵**, so
+- You **cannot afford O(n²)**.
+- You need **O(n)** or **O(n·log n)** at worst.
+
+---
+
+#### Step 2: Match to time complexity
+
+Use the table to guide:
+
+- Use **HashMaps / Sets / Sorting (O(n log n))** if needed.
+- Avoid nested loops unless guaranteed small input (like n ≤ 500).
+
+---
+
+### ✅ Example Decisions
+
+#### Example 1:
+
+```txt
+n <= 10^5
+```
+
+→ **Only O(n log n)** or **O(n)** is safe.
+
+- ✅ Sorting
+- ✅ Prefix sum
+- ✅ Sliding window
+- ❌ Nested loops (O(n²))
+
+---
+
+#### Example 2:
+
+```txt
+matrix of size ≤ 100 x 100
+```
+
+→ O(n³) might be okay.
+
+---
+
+#### Example 3:
+
+```txt
+1 <= n <= 20
+```
+
+→ This is **very small** → brute force or backtracking is fine.
+
+- ✅ Bitmask DP
+- ✅ O(2ⁿ)
+
+---
+
+### 🧠 Practice Tip
+
+When you solve a problem:
+
+1. **Estimate the number of operations** your code does.
+2. Compare with the safe threshold: `10⁷ to 10⁸`.
+3. If you're above it → Time to optimize.
+
+---
