@@ -15,11 +15,30 @@
 
 ---
 
-### ✅ **Prefix Sum**
+### ✅ **Precomputation Techniques**
 
-- Use Prefix Sum when you need to quickly calculate the sum of elements in a subarray multiple times.
+> Use when you want **constant-time lookups** after preprocessing.
 
----
+- `Prefix Sum` : subarray sum: `O(1)` queries after `O(n)` prep.
+
+- `Suffix Sum`
+  : Sum from index `i` to end in `O(1)`.
+
+- `Prefix Max / Min` : Track max/min up to index `i`.
+
+- `Suffix Max / Min` : Track max/min from index `i` to end.
+
+- `Prefix XOR`: Subarray XOR: `prefix[r] ^ prefix[l-1]`.
+
+- `Difference Array` : Efficient range updates. Finalize with prefix sum.
+
+- `Cumulative Frequency`: Count ≤ x in `O(1)` using prefix freq array.
+
+- `Hash Map Frequency`: Track element counts in `O(1)`.
+
+- `Sparse Table` : Fast static range min/max. `O(1)` query, no updates.
+
+- `Prefix Product (Log)`: Subarray product via logs: `sum(logs)` → exp.
 
 ### ✅ **Hashing (HashMap / HashSet)**
 
