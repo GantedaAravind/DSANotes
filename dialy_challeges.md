@@ -652,3 +652,166 @@ function getMaxSumOfWindowLength(nums, k) {
 | Maximize Free Time   | Search for max contiguous sum of `k + 1` free segments |
 
 ---
+
+# 10-07-25
+
+# 🗓️ 10-07-25
+
+## 🧮 **Maximize Free Time by Rescheduling One Meeting (Order Change Allowed)**
+
+### 📘 **Problem Statement**
+
+You are given:
+
+- An integer `eventTime` representing the full duration of an event (`0` to `eventTime`).
+- Two arrays:
+
+  - `startTime[]`: Start times of `n` non-overlapping meetings.
+  - `endTime[]`: End times of those meetings.
+
+Each meeting occurs in the range `[startTime[i], endTime[i]]`.
+
+You can **reschedule at most one meeting**, and you may change:
+
+- Its **start time**, but must maintain the **same duration**.
+- Its **position** in the overall meeting list (relative order **can change**).
+
+🔁 **Goal**: Reschedule one meeting to **maximize the longest continuous period of free time**, while ensuring:
+
+- Meetings remain **non-overlapping**.
+- All meetings are within `[0, eventTime]`.
+
+---
+
+### 🧪 **Test Cases**
+
+**Test Case 1**
+
+```js
+Input: (eventTime = 10), (startTime = [0, 2, 9]), (endTime = [1, 4, 10]);
+Output: 6;
+```
+
+➡️ Reschedule `[2,4]` to `[1,3]`, meetings become: \[0–1], \[1–3], \[9–10]
+➡️ Free time = `[3,9]` → **6**
+
+---
+
+**Test Case 2**
+
+```js
+Input: (eventTime = 5), (startTime = [1, 3]), (endTime = [2, 5]);
+Output: 2;
+```
+
+➡️ Move `[1,2]` to `[2,3]` → Free from `0–2` ⇒ **2**
+
+---
+
+**Test Case 3**
+
+```js
+Input: (eventTime = 5),
+  (startTime = [0, 1, 2, 3, 4]),
+  (endTime = [1, 2, 3, 4, 5]);
+Output: 0;
+```
+
+➡️ No room to move anything → **0**
+
+---
+
+### 💡 **Key Insight**
+
+Since **only one meeting can be rescheduled** and **reordering is allowed**, we:
+
+1. Compute all the **gaps** between meetings (and after last).
+2. Try to **insert the duration of the rescheduled meeting** into any of those gaps.
+3. The **maximum continuous free time** is either:
+
+   - **Gap before rescheduling**, or
+   - **Gap + inserted meeting duration + adjacent gap**, if we can merge.
+
+4. Use `leftMax` and `rightMax` arrays to efficiently calculate best placements.
+
+---
+
+### ✅ **JavaScript Code**
+
+```javascript
+/**
+ * @param {number} eventTime
+ * @param {number[]} startTime
+ * @param {number[]} endTime
+ * @return {number}
+ */
+const maxFreeTime = (eventTime, startTime, endTime) => {
+  const len = startTime.length;
+  const gaps = new Array(len + 1);
+  let lastEnd = 0;
+
+  // Step 1: Calculate gaps between meetings
+  startTime.forEach((s, i) => {
+    gaps[i] = s - lastEnd;
+    lastEnd = endTime[i];
+  });
+
+  // Final gap after the last meeting
+  gaps[len] = eventTime - lastEnd;
+
+  // Step 2: Build right max array for future gaps
+  const rightMax = new Array(len + 1).fill(0);
+  rightMax.reduceRight((_, __, i) => {
+    if (i < len) rightMax[i] = Math.max(rightMax[i + 1], gaps[i + 1]);
+  }, 0);
+
+  // Step 3: Try inserting each meeting in a new position
+  let leftMax = 0;
+  let maxGap = 0;
+
+  startTime
+    .map((_, i) => i + 1)
+    .forEach((i) => {
+      const dur = endTime[i - 1] - startTime[i - 1];
+      const gapL = gaps[i - 1];
+      const gapR = gaps[i];
+
+      // If this meeting can fit into left or right side, try merging
+      if (leftMax >= dur || rightMax[i] >= dur)
+        maxGap = Math.max(maxGap, gapL + dur + gapR);
+
+      // Try merging adjacent gaps directly
+      maxGap = Math.max(maxGap, gapL + gapR);
+
+      // Update left max for future iterations
+      leftMax = Math.max(leftMax, gapL);
+    });
+
+  return maxGap;
+};
+```
+
+---
+
+### ⏱ **Time & Space Complexity**
+
+| Metric | Value  |
+| ------ | ------ |
+| Time   | `O(n)` |
+| Space  | `O(n)` |
+
+- Efficient linear scan using prefix and suffix max arrays.
+
+---
+
+### 📌 **Summary Table**
+
+| Concept        | Explanation                                               |
+| -------------- | --------------------------------------------------------- |
+| `gaps[]`       | Stores all free segments between and after meetings       |
+| `rightMax[]`   | Suffix max of future gaps for fast lookup                 |
+| `leftMax`      | Tracks largest gap on the left side for current iteration |
+| Merge Strategy | Try merging adjacent gaps with one rescheduled meeting    |
+| Final Output   | Max possible merged gap size (continuous free time)       |
+
+---
