@@ -653,8 +653,6 @@ function getMaxSumOfWindowLength(nums, k) {
 
 ---
 
-# 10-07-25
-
 # 🗓️ 10-07-25
 
 ## 🧮 **Maximize Free Time by Rescheduling One Meeting (Order Change Allowed)**
@@ -813,5 +811,216 @@ const maxFreeTime = (eventTime, startTime, endTime) => {
 | `leftMax`      | Tracks largest gap on the left side for current iteration |
 | Merge Strategy | Try merging adjacent gaps with one rescheduled meeting    |
 | Final Output   | Max possible merged gap size (continuous free time)       |
+
+---
+
+# 🗓️ 11-07-25
+
+## 🧮 **Most Booked Meeting Room (with Delay and Rescheduling)**
+
+### 📘 **Problem Statement**
+
+You are given:
+
+- An integer `n`, the number of meeting rooms labeled from `0` to `n-1`.
+- A 2D array `meetings[][]`, where `meetings[i] = [start, end]` represents a meeting request.
+
+Each meeting must be assigned to:
+
+- The **unused room with the lowest index**, if available.
+- Otherwise, it is **delayed until the earliest available room becomes free**, but it must **keep the same duration**.
+
+**When multiple meetings are waiting**, those with **earlier original `start` times** get priority.
+
+---
+
+🔁 **Goal**: Return the room that handled the **most meetings**. If multiple rooms tie, return the one with the **lowest number**.
+
+---
+
+### 🧪 **Test Cases**
+
+#### **Test Case 1**
+
+```js
+Input: (n = 2),
+  (meetings = [
+    [0, 10],
+    [1, 5],
+    [2, 7],
+    [3, 4],
+  ]);
+Output: 0;
+```
+
+✅ **Explanation**:
+
+- Room 0 → \[0,10), then \[10,11)
+- Room 1 → \[1,5), then \[5,10)
+  Both have 2 meetings → Return **0**
+
+---
+
+#### **Test Case 2**
+
+```js
+Input: (n = 3),
+  (meetings = [
+    [1, 20],
+    [2, 10],
+    [3, 5],
+    [4, 9],
+    [6, 8],
+  ]);
+Output: 1;
+```
+
+✅ **Explanation**:
+
+- Room 0 → \[1,20)
+- Room 1 → \[2,10), \[10,12)
+- Room 2 → \[3,5), \[5,10)
+  Room 1 and 2 had 2 each, but **room 1 is smaller** → Return **1**
+
+---
+
+### 💡 **Key Insight**
+
+This is a **heap simulation problem** with:
+
+- One **min-heap for free rooms** (by room number).
+- One **min-heap for busy rooms** (by end time, and room number for tie-break).
+- Sort `meetings` by their **original start time**.
+- Track meeting **counts per room**.
+
+---
+
+### ✅ **JavaScript Code**
+
+```javascript
+class MinHeap {
+  constructor(compare) {
+    this.data = [];
+    this.compare = compare;
+  }
+
+  size() {
+    return this.data.length;
+  }
+
+  top() {
+    return this.data[0];
+  }
+
+  push(val) {
+    this.data.push(val);
+    this._heapifyUp();
+  }
+
+  pop() {
+    if (this.data.length === 1) return this.data.pop();
+    const top = this.data[0];
+    this.data[0] = this.data.pop();
+    this._heapifyDown();
+    return top;
+  }
+
+  _heapifyUp() {
+    let i = this.data.length - 1;
+    while (i > 0) {
+      const p = Math.floor((i - 1) / 2);
+      if (this.compare(this.data[i], this.data[p]) < 0) {
+        [this.data[i], this.data[p]] = [this.data[p], this.data[i]];
+        i = p;
+      } else break;
+    }
+  }
+
+  _heapifyDown() {
+    let i = 0;
+    const n = this.data.length;
+    while (true) {
+      let smallest = i;
+      const l = 2 * i + 1,
+        r = 2 * i + 2;
+      if (l < n && this.compare(this.data[l], this.data[smallest]) < 0)
+        smallest = l;
+      if (r < n && this.compare(this.data[r], this.data[smallest]) < 0)
+        smallest = r;
+      if (smallest !== i) {
+        [this.data[i], this.data[smallest]] = [
+          this.data[smallest],
+          this.data[i],
+        ];
+        i = smallest;
+      } else break;
+    }
+  }
+}
+
+/**
+ * @param {number} n
+ * @param {number[][]} meetings
+ * @return {number}
+ */
+const mostBooked = (n, meetings) => {
+  meetings.sort((a, b) => a[0] - b[0]);
+
+  const roomCount = new Array(n).fill(0);
+
+  // MinHeap for free rooms by room number
+  const freeRooms = new MinHeap((a, b) => a - b);
+  for (let i = 0; i < n; i++) freeRooms.push(i);
+
+  // MinHeap for busy rooms by [endTime, room]
+  const busyRooms = new MinHeap((a, b) =>
+    a[0] !== b[0] ? a[0] - b[0] : a[1] - b[1]
+  );
+
+  for (let [start, end] of meetings) {
+    const duration = end - start;
+
+    // Free rooms that have become available by current start time
+    while (busyRooms.size() && busyRooms.top()[0] <= start) {
+      const [_, room] = busyRooms.pop();
+      freeRooms.push(room);
+    }
+
+    if (freeRooms.size() > 0) {
+      const room = freeRooms.pop();
+      roomCount[room]++;
+      busyRooms.push([end, room]);
+    } else {
+      const [nextEndTime, room] = busyRooms.pop();
+      roomCount[room]++;
+      busyRooms.push([nextEndTime + duration, room]);
+    }
+  }
+
+  let maxMeetings = 0,
+    resultRoom = 0;
+  for (let i = 0; i < n; i++) {
+    if (roomCount[i] > maxMeetings) {
+      maxMeetings = roomCount[i];
+      resultRoom = i;
+    }
+  }
+
+  return resultRoom;
+};
+```
+
+---
+
+### ⏱ **Time & Space Complexity**
+
+| Metric | Value                                        |
+| ------ | -------------------------------------------- |
+| Time   | `O(m log n)` where `m` is number of meetings |
+| Space  | `O(n + m)`                                   |
+
+- Sorting meetings takes `O(m log m)`
+- Each insertion/removal from the heaps is `O(log n)`
+- We process each meeting once
 
 ---
