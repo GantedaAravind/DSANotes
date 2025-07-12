@@ -4,7 +4,7 @@
 
 > It's a Sequence of Well Defined Instructions or rules that specify how to solve a problem in finite no. of steps
 
-### 📘 What is **Asymptotic Notation**?
+# 📘 What is **Asymptotic Notation**?
 
 **Asymptotic Notation** is a method used in **computer science** mathematical tool to describe the **Time Complexity** of a function or algorithm as its i/o size tends towards infinity(i.e., as $n \to \infty$). It helps as understand how to performance of an algorithm **input size grows very large**
 
@@ -16,15 +16,6 @@ We use **asymptotic notation** to:
 
 - Compare the **performance** of algorithms.
 - Focus on the **growth rate**, ignoring constant factors and lower-order terms.
-
----
-
-# 🧠 **Time and Space Complexity**
-
-## 📘 **What is Time and Space Complexity?**
-
-- **Time Complexity** measures how **execution time** grows with **input size**.
-- **Space Complexity** measures how much **extra memory** (excluding input) an algorithm needs as input size grows.
 
 ---
 
@@ -360,6 +351,15 @@ $$
 \frac{f(n)}{g(n)} = \frac{n^2}{n} = n \to \infty
 \Rightarrow n^2 = \omega(n)
 $$
+
+---
+
+# 🧠 **Time and Space Complexity**
+
+### 📘 **What is Time and Space Complexity?**
+
+- **Time Complexity** measures how **execution time** grows with **input size**.
+- **Space Complexity** measures how much **extra memory** (excluding input) an algorithm needs as input size grows.
 
 ---
 
