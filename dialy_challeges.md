@@ -1024,3 +1024,199 @@ const mostBooked = (n, meetings) => {
 - We process each meeting once
 
 ---
+
+# 12-07-25
+
+# 🏆 Tournament Round Matchup
+
+## 🧾 **Problem Statement**
+
+You are given:
+
+- `n`: total number of players, numbered from `1` to `n`.
+- `firstPlayer` and `secondPlayer`: two **top players** who **only lose to each other**.
+
+### 🧩 Rules:
+
+- Players are arranged in a line.
+- In each round:
+
+  - The **ith** player from the **start** plays the **ith** player from the **end**.
+  - If odd number of players, the **middle one advances automatically**.
+
+- After each round, **winners are sorted by their original number order**.
+
+### 🎯 Goal:
+
+Return `[earliest, latest]` round in which `firstPlayer` and `secondPlayer` may compete.
+
+---
+
+## 🧪 Test Cases
+
+### ✅ Test Case 1
+
+```js
+Input: (n = 11), (firstPlayer = 2), (secondPlayer = 4);
+Output: [3, 4];
+```
+
+#### ✅ Explanation:
+
+- **Earliest** path: Let weak players win to eliminate others fast.
+
+  - Round 1: 1 2 3 4 5 6 7 8 9 10 11
+  - Round 2: 2 3 4 5 6 11
+  - Round 3: 2 3 4 ← match!
+
+- **Latest** path: Let `1, 3` win instead of 2’s and 4’s pathmates.
+
+  - Round 1: 1 2 3 4 5 6 7 8 9 10 11
+  - Round 2: 1 2 3 4 5 6
+  - Round 3: 1 2 4
+  - Round 4: 2 4 ← match!
+
+---
+
+### ✅ Test Case 2
+
+```js
+Input: (n = 5), (firstPlayer = 1), (secondPlayer = 5);
+Output: [1, 1];
+```
+
+#### ✅ Explanation:
+
+- Players 1 and 5 meet **immediately** in Round 1: (1 vs 5)
+
+---
+
+## 💡 Key Insight
+
+Simulate each round with:
+
+- A **bitmask** representing which players are still in.
+- Choose any outcome for non-key matches.
+- Use DFS to try **all valid paths**.
+- Track when `firstPlayer` meets `secondPlayer`.
+
+---
+
+Here's your provided **bitmask-based DFS solution**, fully annotated and structured in the same style as previous explanations, under the label `sol`.
+
+---
+
+## ✅ JavaScript Code (🔹`sol` version)
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number} firstPlayer
+ * @param {number} secondPlayer
+ * @return {number[]}
+ */
+var earliestAndLatest = function (n, firstPlayer, secondPlayer) {
+  let min = Infinity;
+  let max = -Infinity;
+
+  // Convert to 0-based indices
+  firstPlayer--;
+  secondPlayer--;
+
+  /**
+   * Recursive DFS with bitmask.
+   * @param {number} mask - current players (bitmask)
+   * @param {number} i - left index
+   * @param {number} j - right index
+   * @param {number} round - current round number
+   */
+  function solve(mask, i, j, round) {
+    if (i >= j) {
+      // All matchups processed → next round
+      solve(mask, 0, n - 1, round + 1);
+      return;
+    }
+
+    // If i-th player is out → skip
+    if ((mask & (1 << i)) === 0) {
+      solve(mask, i + 1, j, round);
+    }
+    // If j-th player is out → skip
+    else if ((mask & (1 << j)) === 0) {
+      solve(mask, i, j - 1, round);
+    }
+    // i and j are both still in play
+    else if (
+      (i === firstPlayer && j === secondPlayer) ||
+      (i === secondPlayer && j === firstPlayer)
+    ) {
+      // Found the round they meet
+      min = Math.min(min, round);
+      max = Math.max(max, round);
+    } else {
+      // Try both outcomes:
+      // Case 1: j wins → i is removed
+      if (i !== firstPlayer && i !== secondPlayer) {
+        solve(mask ^ (1 << i), i + 1, j - 1, round);
+      }
+      // Case 2: i wins → j is removed
+      if (j !== firstPlayer && j !== secondPlayer) {
+        solve(mask ^ (1 << j), i + 1, j - 1, round);
+      }
+    }
+  }
+
+  // All players initially active (bitmask 111...1)
+  solve((1 << n) - 1, 0, n - 1, 1);
+
+  return [min, max];
+};
+```
+
+---
+
+## 💡 Key Insight
+
+- Represent the current state using a **bitmask** (`1 << n`), where `1` means the player is still in the game.
+- In each round:
+
+  - Recursively simulate all valid outcomes for non-critical matchups.
+  - Prune the simulation when `firstPlayer` and `secondPlayer` meet.
+
+---
+
+## ⏱ Time & Space Complexity
+
+| Metric | Value                  |
+| ------ | ---------------------- |
+| Time   | `O(2^n)` worst case    |
+| Space  | `O(n)` recursion depth |
+
+- Works efficiently since `n ≤ 28`.
+
+---
+
+## 🧪 Example
+
+```js
+Input: (n = 11), (firstPlayer = 2), (secondPlayer = 4);
+Output: [3, 4];
+```
+
+```js
+Input: (n = 5), (firstPlayer = 1), (secondPlayer = 5);
+Output: [1, 1];
+```
+
+---
+
+## ✅ Summary Table
+
+| Feature      | Description                                |
+| ------------ | ------------------------------------------ |
+| Approach     | Bitmask + DFS backtracking                 |
+| Key Idea     | Track survivors and simulate both outcomes |
+| First/Second | Only lose to each other                    |
+| Output       | \[Earliest Round, Latest Round]            |
+
+---
