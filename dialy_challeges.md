@@ -1220,3 +1220,131 @@ Output: [1, 1];
 | Output       | \[Earliest Round, Latest Round]            |
 
 ---
+
+# 13-07-25
+
+# 🏆 Largest Number Formation
+
+## 🧾 **Problem Statement**
+
+You are given an array of **non-negative integers**. You need to **arrange them such that they form the largest possible number**.
+
+### 🎯 Goal:
+
+Return the **largest number** that can be formed by arranging the elements as strings.
+
+- If the result is all zeros (e.g., `[0,0]`), return `"0"`.
+
+---
+
+## 🧪 Test Cases
+
+### ✅ Test Case 1
+
+```js
+Input: [3, 30, 34, 5, 9];
+Output: "9534330";
+```
+
+#### ✅ Explanation:
+
+- Optimal order: `9`, `5`, `34`, `3`, `30`
+- Concatenated result: `"9534330"`
+
+---
+
+### ✅ Test Case 2
+
+```js
+Input: [0, 0];
+Output: "0";
+```
+
+#### ✅ Explanation:
+
+- Since all elements are zero, just return `"0"`
+
+---
+
+## 💡 Key Insight
+
+- Sort numbers as **strings**, but **not** in traditional numerical or lexicographical order.
+
+- Compare two numbers `a` and `b` by checking:
+
+  ```js
+  a + b > b + a;
+  ```
+
+- This ensures the arrangement results in the **maximum concatenated value**.
+
+---
+
+## ✅ JavaScript Code
+
+```javascript
+/**
+ * @param {number[]} arr
+ * @return {string}
+ */
+function formLargestNumber(arr) {
+  // Convert all numbers to strings
+  arr = arr.map(String);
+
+  // Sort using custom comparator
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      const ab = arr[i] + arr[j];
+      const ba = arr[j] + arr[i];
+      if (ab < ba) {
+        // Swap if ba should come before ab
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+  }
+
+  // Edge case: all zeros → return "0"
+  if (arr[0] === "0") return "0";
+
+  return arr.join("");
+}
+```
+
+---
+
+## ⏱ Time & Space Complexity
+
+| Metric | Value        |
+| ------ | ------------ |
+| Time   | `O(n^2 * k)` |
+| Space  | `O(n * k)`   |
+
+- `n`: number of elements
+- `k`: average length of number as string
+- Sorting via nested loop (like bubble sort)
+
+> In production, you'd want to use `arr.sort()` with a custom comparator for better performance (`O(n log n)`).
+
+---
+
+## 🧪 Additional Example
+
+```js
+Input: [10, 2];
+Output: "210";
+```
+
+- Comparison: "210" > "102"
+
+---
+
+## ✅ Summary Table
+
+| Feature   | Description                                          |
+| --------- | ---------------------------------------------------- |
+| Approach  | Custom comparator via pairwise string comparison     |
+| Key Idea  | Compare (a + b) vs (b + a) for best arrangement      |
+| Edge Case | Leading zeros → return `"0"` if first digit is `"0"` |
+| Output    | Largest concatenated number as a string              |
+
+---
