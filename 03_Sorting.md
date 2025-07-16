@@ -612,6 +612,8 @@ At each level:
 
 ---
 
+d
+
 # ⚡ Quick Sort
 
 ## 📘 What is Quick Sort?
@@ -695,6 +697,108 @@ function quickSortLeftPivot(arr) {
 
 // Example
 console.log(quickSortLeftPivot([6, 3, 8, 2])); // [2, 3, 6, 8]
+```
+
+---
+
+## 🔄 Variant: Quick Sort with **Rightmost Pivot**
+
+Choosing the **rightmost pivot** is another common strategy.
+
+- Helps avoid **worst-case** in sorted/reverse-sorted arrays (sometimes better than leftmost)
+- Works well with **Lomuto Partition Scheme**
+
+---
+
+### 💡 Partition Logic (Rightmost Pivot)
+
+#### JavaScript Code:
+
+```javascript
+function partition(nums, low, high) {
+  const pivot = nums[high]; // Pivot is rightmost element
+  let i = low; // Place for smaller element
+
+  function swap(i, j) {
+    [nums[i], nums[j]] = [nums[j], nums[i]];
+  }
+
+  for (let j = low; j < high; j++) {
+    if (nums[j] <= pivot) {
+      swap(i, j);
+      i++;
+    }
+  }
+
+  swap(i, high); // Place pivot in the middle
+  return i; // Return pivot index
+}
+```
+
+---
+
+### ⚙️ Quick Sort (Using Rightmost Pivot)
+
+```javascript
+function quickSortRightPivot(arr, low = 0, high = arr.length - 1) {
+  if (low < high) {
+    const pivotIndex = partition(arr, low, high); // Use rightmost pivot
+    quickSortRightPivot(arr, low, pivotIndex - 1);
+    quickSortRightPivot(arr, pivotIndex + 1, high);
+  }
+  return arr;
+}
+```
+
+---
+
+### 🔁 Dry Run
+
+#### Input:
+
+```js
+[6, 3, 8, 2];
+```
+
+- Pivot = 2 (last element)
+- Partition: Swap so that everything ≤ 2 is on the left
+- After partition → `[2, 3, 8, 6]`, pivot index = 0
+- Recursively sort `[3, 8, 6]` with pivot = 6
+
+---
+
+### ✅ Final Output:
+
+```js
+quickSortRightPivot([6, 3, 8, 2]) → [2, 3, 6, 8]
+```
+
+---
+
+### 🔍 Summary Table
+
+| Variant              | Pivot Location | Partition Strategy      | Stability | In-Place |
+| -------------------- | -------------- | ----------------------- | --------- | -------- |
+| Left Pivot (simple)  | First          | Manual loop + recursion | ❌        | ❌       |
+| Right Pivot (Lomuto) | Last           | In-place partitioning   | ❌        | ✅       |
+
+---
+
+### 📦 Space & Time (Same as Left Pivot)
+
+| Case    | Time       | Space      |
+| ------- | ---------- | ---------- |
+| Best    | O(n log n) | O(log n)   |
+| Average | O(n log n) | O(log n)   |
+| Worst   | O(n²)      | O(n) stack |
+
+---
+
+### 🧪 Example Test
+
+```js
+console.log(quickSortRightPivot([6, 3, 8, 2])); // Output: [2, 3, 6, 8]
+console.log(quickSortRightPivot([5, 1, 4, 2, 3])); // Output: [1, 2, 3, 4, 5]
 ```
 
 ---
@@ -1092,7 +1196,7 @@ function shellSort(arr) {
 
 ---
 
-# 🐚 Dry Run
+## 🐚 Dry Run
 
 ### 🔢 Input Array:
 

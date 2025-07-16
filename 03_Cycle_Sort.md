@@ -1,4 +1,4 @@
-# 🔁 Cycle Sort – Full Theory
+# 🔁 Cycle Sort
 
 ## 📘 What is Cycle Sort?
 
@@ -40,10 +40,6 @@ Cycle Sort goes through each cycle and places elements in the right spot with mi
 
 - Works **best** when elements are in range **\[0, N-1]** or **\[1, N]**.
 - Elements should be **distinct** (basic version).
-
----
-
-Sure! Here's the problem **"Cycle Sort"** explained in the exact structured format you're using — intuitive, visual, and with clean JavaScript code.
 
 ---
 
