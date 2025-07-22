@@ -385,7 +385,7 @@ So for **E** edges in an **undirected graph**, we have a total of `2 * E` entrie
 
 **Space Complexity**:
 
-- `O(V + E)` → for the adjacency list
+- $O(2*E)$ → for the adjacency list
 - `O(V)` → for the visited array and BFS queue
 - So overall: `O(V + E)`
 
@@ -528,10 +528,51 @@ function dfsTraversal(V, edges, start) {
 
 ---
 
-### ⏱ **Time and Space Complexity**
+### ⏱ **Time and Space Complexity (DFS)**
 
-- **Time Complexity**: `O(V + E)`
-- **Space Complexity**: `O(V + E)` (adj list) + `O(V)` (visited + recursion stack)
+#### ✅ `Adjacency List`
+
+In an **Adjacency List**, each edge `[u, v]` contributes to both nodes:
+
+- At node `u` we push `v`
+- At node `v` we push `u`
+
+So for **E** edges in an **undirected graph**, total entries = `2 * E`
+
+**Time Complexity**: `O(V + 2E)`
+
+- `O(V)` → to visit all vertices
+- `O(2E)` → to explore all neighbors from adjacency list
+- So overall: `O(V + E)` (constants ignored)
+
+**Space Complexity**:
+
+- `O(2E)` → for the adjacency list
+- `O(V)` → for the visited array
+- `O(V)` → for the **call stack** in the worst case (when DFS is deep)
+
+🔸 **Total**: `O(V + E)`
+
+---
+
+#### ✅ `Adjacency Matrix`
+
+In an **Adjacency Matrix**, each node has a row of size `V`:
+
+- For each node, we must scan through its entire row to find connected nodes.
+
+**Time Complexity**: `O(V^2)`
+
+- `O(V)` → for visiting all vertices
+- For each vertex, we iterate `V` entries → `V * V = V^2`
+
+**Space Complexity**:
+
+- `O(V^2)` → to store the matrix
+- `O(V)` → for the visited array
+- `O(V)` → for the call stack in the worst case
+
+🔸 **Total**: `O(V^2)`
 
 ---
 
