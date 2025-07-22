@@ -1,4 +1,4 @@
-# Graphs in DSA: Beginner to Advanced
+# Graphs
 
 ## 1. Introduction to Graphs
 
@@ -13,7 +13,7 @@ A **graph** is a non-linear data structure consisting of vertices (nodes) and ed
 - Dependency graphs in software
 - Game state representations
 
-## 2. Graph Terminology {#terminology}
+## 2. Graph Terminology
 
 ### Basic Terms
 
@@ -34,7 +34,7 @@ A **graph** is a non-linear data structure consisting of vertices (nodes) and ed
 - **Weakly Connected**: Underlying undirected graph is connected
 - **Bipartite Graph**: Vertices can be divided into two disjoint sets
 
-## 3. Types of Graphs {#types}
+## 3. Types of Graphs
 
 ### 3.1 Based on Direction
 
@@ -367,8 +367,45 @@ function bfsTraversal(V, edges, start) {
 
 ### ⏱ **Time and Space Complexity**
 
-- **Time Complexity**: `O(V + E)`
-- **Space Complexity**: `O(V + E)` (adjacency list) + `O(V)` (queue + visited)
+#### ✅ `Adjacency List`
+
+In an **Adjacency List**, each edge `[u, v]` contributes to both nodes:
+
+- At node `u` we push `v`
+- At node `v` we push `u`
+
+So for **E** edges in an **undirected graph**, we have a total of `2 * E` entries across all lists.
+
+**Time Complexity**: `O(V + 2E)`
+
+- `O(V)` to initialize the visited array
+- `O(2E)` for traversing the adjacency list during BFS
+
+(We ignore constants, so it's `O(V + E)` in Big-O)
+
+**Space Complexity**:
+
+- `O(V + E)` → for the adjacency list
+- `O(V)` → for the visited array and BFS queue
+- So overall: `O(V + E)`
+
+---
+
+#### ✅ `Adjacency Matrix`
+
+In an **Adjacency Matrix**, each node has a row of size `V`:
+
+- So to check all connections from one node, we iterate through its entire row.
+
+**Time Complexity**: `O(V^2)`
+
+- For each of the `V` nodes, we look through a row of size `V` → `V * V = V^2`
+
+**Space Complexity**:
+
+- `O(V^2)` → to store the matrix
+- `O(V)` → for the visited array and BFS queue
+- So overall: `O(V^2)`
 
 ---
 
