@@ -34,6 +34,53 @@ A **graph** is a non-linear data structure consisting of vertices (nodes) and ed
 - **Weakly Connected**: Underlying undirected graph is connected
 - **Bipartite Graph**: Vertices can be divided into two disjoint sets
 
+### 💡 What is a Complete Graph?
+
+A **complete graph** is a graph where **every pair of nodes (vertices) is connected by an edge**.
+
+For example:
+
+- If there are **3 nodes**, we connect each pair:
+  Edges = AB, AC, BC → total **3 edges**.
+
+---
+
+#### 🧮 How many edges in total?
+
+To count the number of edges in a complete graph with `n` nodes:
+
+We just need to count **how many pairs of nodes** we can form.
+
+That’s given by the **combinations formula**:
+
+$$
+\text{Number of edges} = \binom{n}{2} = \frac{n(n-1)}{2}
+$$
+
+---
+
+#### ⚠️ Common Mistake:
+
+Sometimes people mistakenly write:
+
+$$
+\frac{n(n+1)}{2}
+$$
+
+That formula is used to sum the first `n` numbers:
+`1 + 2 + 3 + ... + n = n(n+1)/2`
+✅ **Not correct for counting edges!**
+
+---
+
+#### ✅ Correct Formula for Edges in a Complete Graph:
+
+$$
+\boxed{\text{Edges in complete graph with } n \text{ nodes} = \frac{n(n-1)}{2}}
+$$
+
+---
+
 ## 3. Types of Graphs
 
 ### 3.1 Based on Direction
@@ -5616,6 +5663,95 @@ Let `V = n`, `E = number of edges`
 ---
 
 # Minimum Spanning Tree
+
+### 🌳 What is a Spanning Tree?
+
+- A **spanning tree** of a graph is a subgraph that:
+
+  - Includes **all the vertices**.
+  - Is a **tree** (i.e., connected and no cycles).
+  - Has **exactly (n - 1)** edges if there are `n` vertices.
+
+---
+
+### 🔢 Kirchhoff’s Matrix Tree Theorem:
+
+Kirchhoff’s theorem gives us a way to **calculate the number of spanning trees** in a graph using **linear algebra**.
+
+---
+
+#### 🧮 Steps (in Simple Terms):
+
+1. **Build the Laplacian Matrix** of the graph:
+
+   - This is a square matrix `L` of size `n x n` (for `n` vertices).
+   - create the Matrix with `Adjacency Matrix`
+   - Each element `L[i][j]` is:
+
+     - If `i == j`: number of edges connected to node `i` (degree).
+     - If `i ≠ j`: `-1` if there is an edge between node `i` and node `j`, else `0`.
+
+2. **Find the CoFactor** from the Laplacian matrix.
+
+3. That **CoFactor** is the **number of spanning trees** in the graph.
+
+#### ✨ Example for Complete Graph:
+
+For a **complete graph** with `n` nodes (denoted as `Kₙ`), the number of spanning trees is:
+
+$$
+\boxed{n^{n-2}}
+$$
+
+👉 This is called **Cayley’s Formula** (special case of Kirchhoff's for complete graphs).
+
+---
+
+#### ⚠️ Important Note:
+
+- > **Kirchhoff’s Theorem** gives the **number of spanning trees**,
+- > ❌ **not** the **minimum cost** spanning tree, and
+- > ❌ it does **not work with edge weights** for cost optimization.
+
+---
+
+### ❓ Is the Minimum Spanning Tree (MST) Always Unique?
+
+> ❌ **Not always**.
+> It **depends on the edge weights**.
+
+---
+
+#### 📌 Two Main Cases:
+
+##### ✅ **1. All Edge Weights Are Unique**
+
+- **Yes**, the MST is **guaranteed to be unique**.
+- Why? Because at every step, the algorithm will have **exactly one "smallest edge" to choose**, no ties.
+
+🔍 So, **Prim’s** and **Kruskal’s** will always pick the same edges.
+
+---
+
+##### ⚠️ **2. Edge Weights Are Not Unique (Some edges have same weights)**
+
+- Then, MST **may or may not be unique**.
+- There could be **multiple MSTs** with the **same total cost** but **different edges**.
+
+Example:
+
+```
+A---1---B
+|\     /|
+| 1   1 |
+|/     \|
+C---1---D
+```
+
+- All edges are weight `1`
+- There are **many valid MSTs** (any 3 edges forming a tree)
+
+---
 
 ## 1. Introduction to MST
 
