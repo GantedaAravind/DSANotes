@@ -4185,6 +4185,48 @@ Output: [0, 2, 3, 9, 6];
 
 ### 💡 Intuition
 
+#### 🔄 What is Edge Relaxation?
+
+**Edge relaxation** is a key step in shortest path algorithms like **Dijkstra's** and **Bellman-Ford**.
+
+---
+
+#### 🧠 Simple Definition:
+
+> **Edge relaxation** means:
+> “Check if going through this edge gives a **shorter path** to a node.
+> If yes, then **update** the shortest distance.”
+
+---
+
+#### 🧮 What Happens During Relaxation?
+
+Suppose we have an edge from node `u → v` with weight `w`.
+
+And we already know:
+
+- Distance to `u` = `dist[u]`
+- Distance to `v` = `dist[v]`
+
+Now we check:
+
+```
+if (dist[u] + w < dist[v]) {
+    dist[v] = dist[u] + w;  // We found a better path to v
+}
+```
+
+✅ This is **relaxing edge (u → v)**.
+
+---
+
+#### ✨ Why Is It Called "Relaxation"?
+
+- Because we’re **“relaxing” the constraint** on the distance to `v`.
+- We're **making it shorter** if possible — just like relaxing a tight rope.
+
+---
+
 Dijkstra's Algorithm works like BFS but uses a **priority queue (min-heap)** to always process the **closest unvisited node** first.
 
 It **guarantees the shortest path** in graphs with **non-negative weights**.
@@ -4224,40 +4266,111 @@ class MinHeap {
     this.heap = [];
   }
 
-  push([dist, node]) {
-    this.heap.push([dist, node]);
-    this.heap.sort((a, b) => a[0] - b[0]); // maintain min-heap
+  // 🔼 Insert a new value into the heap
+  insert(value) {
+    this.heap.push(value); // Step 1: Add at the end
+    this._heapifyUp(this.heap.length - 1); // Step 2: Heapify up from the last index
   }
 
-  pop() {
-    return this.heap.shift();
+  // 🧹 Remove and return the minimum element (root)
+  extractMin() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop(); // Move last to root
+    this._heapifyDown(0); // Restore heap property
+
+    return min;
   }
 
-  isEmpty() {
-    return this.heap.length === 0;
+  // 👀 View the minimum element without removing
+  peek() {
+    return this.heap.length > 0 ? this.heap[0] : null;
+  }
+
+  // 🔄 Heapify up from a given index
+  _heapifyUp(index) {
+    while (index > 0) {
+      const parentIndex = Math.floor((index - 1) / 2);
+
+      if (this.heap[parentIndex] <= this.heap[index]) break;
+
+      this._swap(index, parentIndex);
+      index = parentIndex;
+    }
+  }
+
+  // 🔄 Heapify down from a given index
+  _heapifyDown(index) {
+    const length = this.heap.length;
+
+    while (true) {
+      const left = 2 * index + 1;
+      const right = 2 * index + 2;
+      let smallest = index;
+
+      if (left < length && this.heap[left] < this.heap[smallest]) {
+        smallest = left;
+      }
+
+      if (right < length && this.heap[right] < this.heap[smallest]) {
+        smallest = right;
+      }
+
+      if (smallest === index) break;
+
+      this._swap(index, smallest);
+      index = smallest;
+    }
+  }
+
+  // 🔁 Swap helper function
+  _swap(i, j) {
+    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+  }
+
+  // 📏 Return heap size
+  size() {
+    return this.heap.length;
+  }
+
+  // 📦 Return heap as array
+  toArray() {
+    return [...this.heap];
   }
 }
 
 function dijkstra(V, edges, source) {
+  // Build adjacency list: O(E)
   const adj = Array.from({ length: V }, () => []);
   for (let [u, v, wt] of edges) {
     adj[u].push([v, wt]);
     adj[v].push([u, wt]); // remove if directed
   }
 
+  // Initialize distance array: O(V)
   const dist = new Array(V).fill(Infinity);
   dist[source] = 0;
 
+  // Min-heap to store [distance, node]
   const minHeap = new MinHeap();
-  minHeap.push([0, source]);
+  minHeap.insert([0, source]); // O(log V)
 
+  // Main loop runs while heap is not empty
   while (!minHeap.isEmpty()) {
-    const [currentDist, node] = minHeap.pop();
+    // Extract min node: O(log V)
+    const [currentDist, node] = minHeap.extractMin();
 
+    // Traverse all neighbors: total over whole run is O(E)
     for (let [neighbor, weight] of adj[node]) {
+      // Relaxation check
       if (currentDist + weight < dist[neighbor]) {
         dist[neighbor] = currentDist + weight;
-        minHeap.push([dist[neighbor], neighbor]);
+
+        // Decrease-key simulated as push: O(log V)
+        // If using indexed heap or Fibonacci heap, it would be actual decrease-key
+        minHeap.insert([dist[neighbor], neighbor]);
       }
     }
   }
@@ -4268,16 +4381,143 @@ function dijkstra(V, edges, source) {
 
 ---
 
-### ⏱ Time and Space Complexity
+### ❓ Can Dijkstra’s Algorithm Work with Negative Edges?:
 
-Let `V = number of vertices`, `E = number of edges`
+> **Dijkstra’s algorithm does not work with negative edge weights,**
+> even if the graph has no negative cycles.
+> It also **cannot detect negative cycles.**
 
-- **Time Complexity**:
+---
 
-  - Using binary heap: `O((V + E) log V)`
-  - Naive array-based heap: `O(V^2)`
+### 🔽 What is Decrease Key in Heap?
 
-- **Space Complexity**: `O(V + E)`
+> **Decrease Key** means:
+> "Given a node in a heap, **lower its key value** (make it smaller),
+> and **fix the heap** to maintain its property."
+
+---
+
+#### 🧠 When Do We Use It?
+
+- Most commonly used in **Dijkstra’s Algorithm** when we find a **shorter path** to a node.
+- We need to **update that node’s priority** (distance) in the heap.
+
+---
+
+#### 🏗️ How It Works in a Min-Heap:
+
+Suppose you have a **Min Heap**, and a node’s value decreases.
+
+**Steps:**
+
+1. Update the node's key (make it smaller).
+2. Since it might now be **smaller than its parent**, **bubble it up** (heapify up).
+3. Continue until the heap property is restored.
+
+---
+
+#### 🔁 Visual Example:
+
+Initial Min-Heap:
+
+```
+       2
+      / \
+     5   8
+    /
+   10
+```
+
+Now decrease `10` to `1` → becomes:
+
+```
+       2
+      / \
+     5   8
+    /
+   1
+```
+
+Now **heapify up**:
+
+- 1 < 5 → swap
+- 1 < 2 → swap again
+
+Final heap:
+
+```
+       1
+      / \
+     2   8
+    /
+   5
+```
+
+---
+
+#### ⚠️ Important Notes:
+
+- Heap must support **efficient location of elements** to do `decreaseKey` fast (usually done with an index map).
+- Binary Heap: `O(log n)` for decreaseKey.
+- Fibonacci Heap: `O(1)` amortized (used in theoretical improvements for Dijkstra).
+  Absolutely! Here's a breakdown of **Time and Space Complexity** for **Dijkstra’s Algorithm**, just like your format — but with explanations for **how** each part comes:
+
+---
+
+### ⏱ **Time and Space Complexity**
+
+Let:
+
+- `V = number of vertices (nodes)`
+- `E = number of edges`
+
+---
+
+### ✅ **Time Complexity**
+
+#### 🔹 Using **Binary Heap / Priority Queue**:
+
+$$
+\boxed{O((V + E) \log V)}
+$$
+
+#### 🔍 Why?
+
+1. **Initialization**:
+
+   - Set distance for each node → `O(V)`
+
+2. **Min-Heap Operations**:
+
+   - Each `extractMin()` from heap takes `O(log V)`
+   - Each node is popped **at most once** → `O(V log V)`
+
+3. **Relaxation (for edges)**:
+
+   - Each edge may lead to a `insert()` into the heap → `O(log V)` per edge
+   - Total edges = `E` → `O(E log V)`
+
+✅ Combine both:
+
+```
+Total = O(V log V) [pops] + O(E log V) [relaxations]
+      = O((V + E) log V)
+```
+
+---
+
+### 🧠 **Space Complexity**
+
+$$
+\boxed{O(V + E)}
+$$
+
+#### 🔍 Why?
+
+- **`adjacency list`** → stores all edges: `O(E)`
+- **`dist` array** → stores shortest distance to each node: `O(V)`
+- **Min Heap** → stores up to `V` elements: `O(V)`
+- **Total**: `O(V + E)`
 
 ---
 
