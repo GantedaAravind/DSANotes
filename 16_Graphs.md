@@ -5529,6 +5529,25 @@ Dijkstra's Algorithm doesn’t work for **negative weight edges**.
   (The shortest path can have at most `V-1` edges)
 - On the **V-th iteration**, if any edge still gets relaxed → **negative cycle exists**
 
+#### 🔍 What happens in each pass?
+
+- **1st pass** → finds the shortest paths that use at most **1 edge**
+- **2nd pass** → finds shortest paths that use at most **2 edges**
+- **3rd pass** → shortest paths using at most **3 edges**
+- ...
+- **(V-1)th pass** → shortest paths using at most **(V-1) edges**
+
+Why stop at **V-1 passes**?
+
+> Because in a graph with `V` vertices, the **longest possible simple path** (no cycles) has at most `V-1` edges.
+> So, any shortest path must be found within `V-1` edges.
+
+---
+
+#### ⚠️ What if we do one more (V-th) pass?
+
+- If **any edge still relaxes** (i.e., updates a distance), it means there is a **negative weight cycle** in the graph.
+
 ---
 
 ### 🔍 Dry Run
@@ -5593,16 +5612,6 @@ Let `V = vertices`, `E = edges`
 | Detects Negative Cycles  | ✅ Yes                                |
 | Approach                 | Edge Relaxation V-1 times             |
 | Edge Cost Constraint     | No constraint on sign of edge weights |
-
----
-
-### 🧩 Applications
-
-| Use Case                                   | Why Bellman-Ford?                |
-| ------------------------------------------ | -------------------------------- |
-| 🔹 Routing Algorithms (e.g., RIP protocol) | Handles negative weights         |
-| 🔹 Currency Arbitrage Detection            | Detects negative weight cycles   |
-| 🔹 Longest Path in DAG (with tweaks)       | Reverse weights and Bellman-Ford |
 
 ---
 
