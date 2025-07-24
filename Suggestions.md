@@ -72,6 +72,7 @@
 
 ### ✅ **Recursion & Backtracking**
 
+- There are multiple ways
 - Use for exhaustive search in combinations, permutations, N-Queens, Sudoku.
 - Backtracking = recursion with pruning.
 
@@ -138,6 +139,20 @@
 - Deque: Sliding window max/min, LRU cache.
 
 ---
+
+### 🔹 **If it's an optimization problem:**
+
+- Use **Greedy** if:
+
+  - Making the best choice at each step leads to the best overall solution.
+  - No need to check all combinations.
+
+- Use **Dynamic Programming (DP)** if:
+
+  - Choices depend on previous results.
+  - Problem has overlapping subproblems and needs memory to avoid recomputation.
+
+👉 **Try Greedy first** — if it fails, use **DP**.
 
 ## ✅ **Golden Rule of Thumb**
 

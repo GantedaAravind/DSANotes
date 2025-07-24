@@ -12,7 +12,7 @@ Dynamic Programming is an algorithmic technique used for **solving problems with
 
 1. ### **Overlapping Subproblems**
 
-   - The problem can be broken down into smaller subproblems which are reused several times.
+   - The problems where smaller subproblems can solved several times.
    - Example: In Fibonacci, `fib(5)` calls `fib(4)` and `fib(3)`, and so does `fib(4)` again.
 
 2. ### **Optimal Substructure**
@@ -11903,7 +11903,7 @@ function minCut(s) {
 
 ---
 
-### 🔍 Dry Run Example: s = "aab"
+#### 🔍 Dry Run Example: s = "aab"
 
 ```txt
 isPal matrix:
@@ -11924,13 +11924,128 @@ But since "aa" is palindrome, we only need 1 cut in total.
 
 ---
 
-### 📌 Summary Table
+### ✅ **Optimized DP: Precompute Palindromes + Bottom-Up DP**
 
-| Approach                              | Time      | Space | Notes                    |
-| ------------------------------------- | --------- | ----- | ------------------------ |
-| Recursion                             | O(2^n) ❌ | O(n)  | Brute force              |
-| Memoization (Top)                     | O(n³) ❌  | O(n)  | Caches recursion results |
-| Tabulation + Palindrome Preprocessing | O(n²) ✅  | O(n²) | Most efficient           |
+#### 🔍 Observation:
+
+A string is a palindrome if:
+
+- The first and last characters are equal: `s[i] === s[j]`
+- The middle part `s[i+1..j-1]` is also a palindrome
+
+So we can build `isPal[i][j]` using this recurrence:
+
+```
+isPal[i][j] = (s[i] === s[j]) && isPal[i+1][j-1]
+```
+
+---
+
+#### 🧠 Base Cases:
+
+- Every **single character** is a palindrome: `isPal[i][i] = true`
+- Every **two-character substring** is a palindrome **if** `s[i] === s[i+1]`
+
+---
+
+#### 🔁 Build in Bottom-Up Order:
+
+Start from shorter substrings and use their results to build longer substrings.
+
+- First fill substrings of length 1
+- Then length 2
+- Then build up to length n
+
+So when computing `isPal[i][j]`, the value of `isPal[i+1][j-1]` is already known.
+
+---
+
+#### 📦 Result:
+
+After building `isPal`, any time we want to check whether `s[i..j]` is a palindrome, we just lookup:
+
+```js
+if (isPal[i][j]) {
+  // proceed
+}
+```
+
+This lookup takes **O(1)** time ✅
+
+---
+
+#### ✅ Code
+
+```js
+function minCut(s) {
+  const n = s.length;
+  const isPal = Array.from({ length: n }, () => Array(n).fill(false));
+
+  // Precompute isPal[i][j]
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = i; j < n; j++) {
+      if (s[i] === s[j]) {
+        if (j - i <= 1) {
+          isPal[i][j] = true; // length 1 or 2
+        } else {
+          isPal[i][j] = isPal[i + 1][j - 1];
+        }
+      }
+    }
+  }
+
+  const dp = new Array(n + 1).fill(0);
+  dp[n] = 0; // no cut needed beyond string
+
+  for (let i = n - 1; i >= 0; i--) {
+    let minCuts = Infinity;
+
+    for (let j = i; j < n; j++) {
+      if (isPal[i][j]) {
+        const cuts = 1 + dp[j + 1];
+        minCuts = Math.min(minCuts, cuts);
+      }
+    }
+
+    dp[i] = minCuts;
+  }
+
+  return dp[0] - 1; // subtract final unnecessary cut
+}
+```
+
+---
+
+#### 🧪 Test Cases
+
+```js
+console.log(minCut("aab")); // 1
+console.log(minCut("a")); // 0
+console.log(minCut("ab")); // 1
+console.log(minCut("racecar")); // 0
+console.log(minCut("banana")); // 1 => ["b", "anana"]
+```
+
+---
+
+#### ⏱ Time & Space Complexity
+
+| Component          | Complexity |
+| ------------------ | ---------- |
+| Precomputing isPal | O(n²)      |
+| Filling DP array   | O(n²)      |
+| **Total Time**     | ✅ O(n²)   |
+| **Space**          | O(n²)      |
+
+---
+
+#### 📌 Summary Table
+
+| Approach                               | Time     | Space | Notes                            |
+| -------------------------------------- | -------- | ----- | -------------------------------- |
+| Recursion                              | O(2ⁿ) ❌ | O(n)  | Brute force                      |
+| Memoization (Top-Down)                 | O(n³) ❌ | O(n)  | DP + on-the-fly palindrome check |
+| ✅ Tabulation + Precomputed Palindrome | O(n²) ✅ | O(n²) | Fastest with boolean table       |
 
 ---
 

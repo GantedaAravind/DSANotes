@@ -1,3 +1,72 @@
+# 📚 DSA (Data Structures & Algorithms)
+
+### 📦 Data Structures
+
+- **Arrays**
+- **Strings**
+- **Trees**
+
+  - Binary Trees
+  - Binary Search Trees (BST)
+  - Trie
+  - Segment Trees / Fenwick Trees (as needed)
+
+- **Stacks**
+- **Queues**
+
+  - Circular Queue
+  - Priority Queue
+
+- **Heaps**
+
+  - Min-Heap
+  - Max-Heap
+
+---
+
+### ⚙️ Algorithms
+
+#### 🔁 Recursion & Backtracking
+
+- Subsets, Permutations
+- N-Queens
+- Sudoku Solver
+
+#### 📈 Greedy Algorithms
+
+- Activity Selection
+- Huffman Coding
+- Job Scheduling
+
+#### 🧠 Dynamic Programming (DP)
+
+- 0/1 Knapsack
+- Longest Increasing Subsequence
+- Matrix Chain Multiplication
+- DP on Trees, Grids, Strings
+- Memoization & Tabulation
+
+#### 🗺 Graph Algorithms
+
+- **Dijkstra’s Algorithm**
+- **BFS / DFS**
+- **Bellman-Ford**
+- **Floyd-Warshall**
+- **Union-Find (Disjoint Set)**
+- **Topological Sort**
+- **Minimum Spanning Tree**
+
+  - Prim’s
+  - Kruskal’s
+
+#### 📊 Sorting & Searching
+
+- Binary Search
+- Merge Sort / Quick Sort
+- Counting Sort / Radix Sort
+
+---
+
 # 📘 A2Z DSA Notes
 
 Welcome to the **A2Z DSA Notes** repository! This repository contains detailed notes on **Data Structures and Algorithms**, aligned with the **A2Z DSA Sheet** from takeUforward.
