@@ -889,3 +889,115 @@ console.log(sieveOfEratosthenes(10)); // Output: [2, 3, 5, 7]
 - This is much faster than checking primality one-by-one up to `n`.
 
 ---
+
+# 🔢 **Segmented Sieve – Find Primes Between M and N (Large Range)**
+
+### 🧠 Problem Statement:
+
+**Given two integers `M` and `N` such that `1 ≤ M ≤ N ≤ 10^14` and `N - M ≤ 10^6`, find all prime numbers in the range `[M, N]`.**
+
+---
+
+### 💡 Why Normal Sieve Fails?
+
+- Regular sieve requires memory of size `N`, which is not feasible when `N = 10^14`.
+- But since the gap `N - M` is small, we can use a **Segmented Sieve** to sieve only this small segment.
+
+---
+
+## ✅ Intuition:
+
+1. First, **generate all primes up to √N** using normal **Sieve of Eratosthenes**.
+2. Create a boolean array of size `(N - M + 1)` initialized to `true` (assume all are prime).
+3. For each prime `p` ≤ √N:
+
+   - Mark **multiples of `p` in the range \[M, N]** as non-prime.
+
+4. The remaining `true` values in the segment represent **prime numbers in `[M, N]`**.
+
+---
+
+## 🔄 Step-by-step Example (M = 22, N = 29):
+
+1. √29 = 5.3 ⇒ Sieve primes up to 5 → \[2, 3, 5]
+2. Create segment: `isPrimeSegment[22..29]` → size = 8, all `true`
+3. For each prime `p`, mark multiples:
+
+   - p = 2 → mark 22, 24, 26, 28
+   - p = 3 → mark 24, 27
+   - p = 5 → mark 25
+
+4. Remaining unmarked: \[23, 29] → ✅ primes in \[22, 29]
+
+---
+
+## 🧑‍💻 JavaScript Code
+
+```javascript
+function sieve(limit) {
+  const isPrime = new Array(limit + 1).fill(true);
+  isPrime[0] = isPrime[1] = false;
+
+  for (let i = 2; i * i <= limit; i++) {
+    if (isPrime[i]) {
+      for (let j = i * i; j <= limit; j += i) {
+        isPrime[j] = false;
+      }
+    }
+  }
+
+  const primes = [];
+  for (let i = 2; i <= limit; i++) {
+    if (isPrime[i]) primes.push(i);
+  }
+  return primes;
+}
+
+function segmentedSieve(M, N) {
+  const limit = Math.floor(Math.sqrt(N));
+  const primes = sieve(limit);
+
+  const isPrimeSegment = new Array(N - M + 1).fill(true);
+
+  for (const p of primes) {
+    // Find the first multiple of p in [M, N]
+    let start = Math.max(p * p, Math.ceil(M / p) * p);
+
+    for (let j = start; j <= N; j += p) {
+      isPrimeSegment[j - M] = false;
+    }
+  }
+
+  if (M === 1) isPrimeSegment[0] = false;
+
+  const result = [];
+  for (let i = 0; i < isPrimeSegment.length; i++) {
+    if (isPrimeSegment[i]) {
+      result.push(M + i);
+    }
+  }
+
+  return result;
+}
+
+// Example usage:
+console.log(segmentedSieve(10 ** 14, 10 ** 14 + 50));
+```
+
+---
+
+## 📚 Summary Table:
+
+| Concept         | Technique                            | Time Complexity            | Space Complexity |
+| --------------- | ------------------------------------ | -------------------------- | ---------------- |
+| Segmented Sieve | Sieve up to √N, then mark in \[M, N] | `O(√N + (N−M) log log √N)` | `O(√N + N−M)`    |
+
+---
+
+## 📌 Notes for Beginners:
+
+- `Math.max(p * p, ceil(M / p) * p)` ensures we start marking in `[M, N]`.
+- Use regular sieve only up to `√N` which is small even for `N = 10^14` (i.e., up to `10^7`).
+- The segment size is small (`≤ 10^6`), so this method is fast and memory-efficient.
+
+---
