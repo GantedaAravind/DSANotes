@@ -484,8 +484,6 @@ function gcd(a, b) {
 
 # **Armstrong Numbers** (a.k.a. Narcissistic Numbers)
 
----
-
 ## ✨ What is an Armstrong Number?
 
 An **Armstrong number** is a number that **equals the sum of its own digits each raised to the power of the number of digits**. ([exercism.org][1])
@@ -792,5 +790,102 @@ console.log(isPrime(100)); // false
 | -------------------- | --------------- | --------------------------- |
 | Brute Force (1 to n) | O(n)            | Slow for large `n`          |
 | Optimized (1 to √n)  | O(√n)           | Best for checking large `n` |
+
+---
+
+# 🔢 **Sieve of Eratosthenes – Find All Primes from 1 to n**
+
+## 🧠 Problem Statement:
+
+**Given an integer `n`, return all prime numbers from `1` to `n`.**
+
+---
+
+## 🔍 Example:
+
+- Input: `n = 10`
+- Output: `[2, 3, 5, 7]`
+  (Because these are the only prime numbers between 1 and 10)
+
+---
+
+## ✅ Approach: Sieve of Eratosthenes
+
+---
+
+## 💡 Intuition:
+
+- A **prime number** is only divisible by **1 and itself**.
+- Instead of checking each number one by one (slow!), we **mark multiples of primes as non-prime**.
+- Efficiently eliminates all non-primes in a range using a **boolean array**.
+
+---
+
+## 🧠 Core Idea:
+
+1. Create a boolean array `isPrime[]` of size `n+1` and initialize all values as `true`.
+2. Set `isPrime[0]` and `isPrime[1]` to `false` (0 and 1 are not prime).
+3. Start from `2` and iterate till `√n`:
+
+   - If `isPrime[i]` is `true`, mark **all multiples of `i`** as `false`.
+
+4. At the end, the indices where `isPrime[i]` is still `true` are primes.
+
+---
+
+## 🔄 Diagram (n = 10):
+
+```
+Initial:  [F, F, T, T, T, T, T, T, T, T, T]
+Index:     0  1  2  3  4  5  6  7  8  9 10
+
+Step i=2: Mark 4,6,8,10 -> [F, F, T, T, F, T, F, T, F, T, F]
+Step i=3: Mark 6,9     -> [F, F, T, T, F, T, F, T, F, F, F]
+
+Primes: Indices with `true` = [2, 3, 5, 7]
+```
+
+---
+
+## 🧑‍💻 JavaScript Code:
+
+```javascript
+function sieveOfEratosthenes(n) {
+  const isPrime = new Array(n + 1).fill(true);
+  isPrime[0] = isPrime[1] = false;
+
+  for (let i = 2; i * i <= n; i++) {
+    if (isPrime[i]) {
+      for (let j = i * i; j <= n; j += i) {
+        isPrime[j] = false;
+      }
+    }
+  }
+
+  const primes = [];
+  for (let i = 2; i <= n; i++) {
+    if (isPrime[i]) primes.push(i);
+  }
+  return primes;
+}
+
+console.log(sieveOfEratosthenes(10)); // Output: [2, 3, 5, 7]
+```
+
+---
+
+## 📚 Summary Table:
+
+| Concept               | Technique                | Time Complexity  | Space Complexity |
+| --------------------- | ------------------------ | ---------------- | ---------------- |
+| Sieve of Eratosthenes | Mark multiples of primes | `O(n log log n)` | `O(n)`           |
+
+---
+
+## 📌 Notes for Beginners:
+
+- Marking from `i * i` instead of `2 * i` improves performance.
+- Use `i * i <= n` to limit the outer loop, since larger factors would’ve already been marked.
+- This is much faster than checking primality one-by-one up to `n`.
 
 ---

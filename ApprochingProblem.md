@@ -1,0 +1,5 @@
+- understand the problem in such way that you can explain to your friend or interviewr
+- take the edge cases
+- dry run
+- code
+- TC & SC optimize
