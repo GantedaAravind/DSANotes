@@ -362,8 +362,6 @@ These concepts are often used in **math-based DSA problems**, number theory, and
 
 # 📘 GCD / HCF
 
----
-
 ## 🧠 What is GCD or HCF?
 
 - The **GCD (Greatest Common Divisor)** or **HCF (Highest Common Factor)** of two numbers is the **largest number that divides both numbers exactly**.
@@ -412,7 +410,7 @@ console.log(gcdNaive(12, 18)); // Output: 6
 
 ---
 
-## ⚡ 2. Efficient Approach: Euclidean Algorithm
+# ⚡ 2. Efficient Approach: Euclidean Algorithm
 
 ### 💡 Intuition:
 
@@ -464,9 +462,41 @@ function gcd(a, b) {
 }
 ```
 
+> **Every 2 steps, the numbers shrink by at least half.**
+
+### 🔍 Let’s Zoom Into 2 Steps
+
+### 🧮 Step 1:
+
+Start with `a > b`.
+
+- Compute `r1 = a % b`
+  Now the new pair is `(b, r1)`.
+
+### 🧮 Step 2:
+
+- Compute `r2 = b % r1`
+  Now the new pair is `(r1, r2)`.
+
+We want to prove:
+
+> After these 2 steps, the **smaller number becomes ≤ half** of the previous one.
+
+#W# 🧠 Why Does This Matter?
+
+Every 2 steps, we’re shrinking the number by at least half.
+
+So the size of the number drops like this:
+
+```
+n → n/2 → n/4 → n/8 → ... until it becomes 0
+```
+
+This is a **logarithmic drop**, and it only takes about `log₂(n)` steps to get to zero.
+
 ---
 
-## 📚 Summary Table
+#E# 📚 Summary Table
 
 | Approach       | Time Complexity   | Space | Suitable For           |
 | -------------- | ----------------- | ----- | ---------------------- |
