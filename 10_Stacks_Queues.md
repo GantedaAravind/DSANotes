@@ -535,7 +535,7 @@ console.log(minStack.getMin()); // -2
 
 # **Prefix, Infix, PostFix Conversion Problems**
 
-## 📘 ** Introduction to Expressions in Programming**
+## 📘 **Introduction to Expressions in Programming**
 
 Expressions are combinations of:
 
@@ -550,7 +550,7 @@ There are **three common notations** for writing expressions:
 
 ---
 
-### 🔹 ** Infix Notation**
+### 🔹 **Infix Notation**
 
 ### ✅ **Definition:**
 

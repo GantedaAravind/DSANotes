@@ -1,4 +1,4 @@
-# 📘 Recursion: Complete Notes
+# 📘 Recursion
 
 ## 🔁 What is Recursion?
 
@@ -2010,7 +2010,7 @@ console.log(letterCombinations("23"));
 
 ---
 
-# Hard ( Trying out all combos)
+# Hard
 
 ## 1. **Palindrome Partitioning**
 
